@@ -31,6 +31,16 @@ source "drivers/media/platform/davinci/Kconfig"
 
 source "drivers/media/platform/omap/Kconfig"
 
+
+config VIDEO_V4L2_NUVOTON
+	tristate "Nuvoton NPCM750 V4L2 Video Engine driver"
+	depends on VIDEO_V4L2
+	select VIDEOBUF2_CORE
+	select VIDEOBUF2_VMALLOC
+	select VIDEOBUF2_DMA_CONTIG
+	help
+	  Support for Nuvoton npcm750
+
 config VIDEO_SH_VOU
 	tristate "SuperH VOU video output driver"
 	depends on MEDIA_CAMERA_SUPPORT

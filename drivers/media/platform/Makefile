@@ -93,4 +93,7 @@ obj-$(CONFIG_VIDEO_QCOM_VENUS)		+= qcom/venus/
 
 obj-$(CONFIG_VIDEO_NUVOTON)		+= nuvoton/
 
-obj-y					+= meson/
+obj-y                                  += meson/
+
+obj-$(CONFIG_VIDEO_V4L2_NUVOTON)	+= nuvoton-video.o
+
