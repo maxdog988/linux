@@ -38,7 +38,8 @@
 #define VCD_IOCGETDIFF	_IOR(VCD_IOC_MAGIC,  4, struct rect)
 #define VCD_IOCDIFFCNT	_IOR(VCD_IOC_MAGIC,  5, int)
 #define VCD_IOCDEMODE	_IOR(VCD_IOC_MAGIC,  6, u8)
-#define VCD_IOC_MAXNR     6
+#define VCD_IOCRESET    _IO(VCD_IOC_MAGIC, 7)
+#define VCD_IOC_MAXNR     7
 
 #define VCD_OP_TIMEOUT msecs_to_jiffies(100)
 
@@ -1109,6 +1110,9 @@ npcm750_do_vcd_ioctl(struct npcm750_vcd *vcd, unsigned int cmd,
 
 		break;
 	}
+	case VCD_IOCRESET:
+		npcm750_vcd_reset(vcd);
+		break;
 	default:
 		break;
 	}

@@ -74,7 +74,9 @@
 #define ECE_IOCSETLP _IOW(ECE_IOC_MAGIC, 3, struct ece_ioctl_cmd)
 #define ECE_IOCGET_OFFSET _IOR(ECE_IOC_MAGIC, 4, u32)
 #define ECE_IOCCLEAR_OFFSET _IO(ECE_IOC_MAGIC, 5)
-#define ECE_IOC_MAXNR 5
+#define ECE_IOCENCADDR_RESET _IO(ECE_IOC_MAGIC, 6)
+#define ECE_RESET _IO(ECE_IOC_MAGIC, 7)
+#define ECE_IOC_MAXNR 7
 
 struct ece_ioctl_cmd {
 	unsigned int framebuf;
@@ -433,6 +435,27 @@ long npcm750_ece_ioctl(struct file *filp, unsigned int cmd, unsigned long args)
 		err = copy_to_user((int __user *)args, &data, sizeof(data))
 			? -EFAULT : 0;
 		break;
+	}
+	case  ECE_IOCENCADDR_RESET:
+	{
+		npcm750_ece_clear_rect_offset(ece);
+		npcm750_ece_set_enc_dba(ece,ece->comp_start);
+		ece->lin_pitch = DEFAULT_LP;
+		break;
+	}
+	case ECE_RESET:
+	{
+		npcm750_ece_reset(ece);
+		npcm750_ece_set_enc_dba(ece, ece->comp_start);
+
+		ece->enc_gap =
+			(npcm750_ece_read(ece, HEX_CTRL) & HEX_CTRL_ENC_GAP)
+			>> HEX_CTRL_ENC_GAP_OFFSET;
+
+		if (ece->enc_gap == 0)
+			ece->enc_gap = HEX_CTRL_ENC_MIN_GAP_SIZE;
+
+		 break;
 	}
 	default:
 		break;
