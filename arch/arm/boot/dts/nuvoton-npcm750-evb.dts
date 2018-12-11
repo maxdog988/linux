@@ -582,6 +582,39 @@
 				&gpio231o_pins
 				&gpio255_pins>;
 	};
+
+	jtag {
+		compatible = "nuvoton,npcm750-jtag";
+		enable_pspi_jtag = <1>;
+		pspi-index = <1>;
+		tck {
+			label = "tck";
+			gpios = <&gpio5 15 0>;
+			reg = <0xf0015000 0x1000>;
+			offset = <15>;
+		};
+
+		tdi {
+			label = "tdi";
+			gpios = <&gpio5 16 0>;
+			reg = <0xf0015000 0x1000>;
+			offset = <16>;
+		};
+
+		tdo {
+			label = "tdo";
+			gpios = <&gpio5 17 0>;
+			reg = <0xf0015000 0x1000>;
+			offset = <17>;
+		};
+
+		tms {
+			label = "tms";
+			gpios = <&gpio6 11 0>;
+			reg = <0xf0016000 0x1000>;
+			offset = <11>;
+		};
+	 };
 };
 
 &gcr {

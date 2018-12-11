@@ -1,0 +1,6 @@
+config NUVOTON_JTAG
+	tristate "Jtag master driver"
+	default n
+	help
+	  Jtag master driver.
+
