@@ -241,7 +241,7 @@ static int npcmgpio_set_irq_type(struct irq_data *d, unsigned int type)
 		gpiochip_get_data(irq_data_get_irq_chip_data(d));
 	unsigned int gpio = BIT(d->hwirq);
 
-	dev_dbg(d->chip->parent_device, "setirqtype: %u.%u = %u\n", gpio,
+	dev_info(d->chip->parent_device, "setirqtype: %u.%u = %u\n", gpio,
 		d->irq, type);
 	switch (type) {
 	case IRQ_TYPE_EDGE_RISING:
@@ -317,19 +317,38 @@ static void npcmgpio_irq_unmask(struct irq_data *d)
 	iowrite32(BIT(gpio), bank->base + NPCM7XX_GP_N_EVENS);
 }
 
-static unsigned int npcmgpio_irq_startup(struct irq_data *d)
+static int npcmgpio_irq_request_resources(struct irq_data *d)
+{
+	struct gpio_chip *gc = irq_data_get_irq_chip_data(d);
+	unsigned int gpio = d->hwirq;
+	int ret;
+
+	/* active-high, input, clear interrupt, enable interrupt */
+	dev_info(d->chip->parent_device, "irq_request_resources: %u.%u\n", gpio, d->irq);
+
+	npcmgpio_direction_input(gc, gpio);
+
+	ret = gpiochip_lock_as_irq(gc, gpio);
+	if (ret) {
+		dev_info(d->chip->parent_device, "unable to lock HW IRQ %lu for IRQ\n",
+			d->hwirq);
+		return ret;
+	}
+
+	npcmgpio_irq_ack(d);
+	npcmgpio_irq_unmask(d);
+}
+
+static void npcmgpio_irq_release_resources(struct irq_data *d)
 {
 	struct gpio_chip *gc = irq_data_get_irq_chip_data(d);
 	unsigned int gpio = d->hwirq;
 
-	/* active-high, input, clear interrupt, enable interrupt */
-	dev_dbg(d->chip->parent_device, "startup: %u.%u\n", gpio, d->irq);
-	npcmgpio_direction_input(gc, gpio);
-	npcmgpio_irq_ack(d);
-	npcmgpio_irq_unmask(d);
+	dev_info(d->chip->parent_device, "irq_release_resources: %u.%u\n", gpio, d->irq);
 
-	return 0;
+	gpiochip_unlock_as_irq(gc, gpio);
 }
+
 
 static struct irq_chip npcmgpio_irqchip = {
 	.name = "NPCM7XX-GPIO-IRQ",
@@ -337,7 +356,8 @@ static struct irq_chip npcmgpio_irqchip = {
 	.irq_unmask = npcmgpio_irq_unmask,
 	.irq_mask = npcmgpio_irq_mask,
 	.irq_set_type = npcmgpio_set_irq_type,
-	.irq_startup = npcmgpio_irq_startup,
+	.irq_request_resources = npcmgpio_irq_request_resources,
+	.irq_release_resources = npcmgpio_irq_release_resources,
 };
 
 /* pinmux handing in the pinctrl driver*/
@@ -1639,7 +1659,7 @@ static int npcm7xx_pinmux_set_mux(struct pinctrl_dev *pctldev,
 {
 	struct npcm7xx_pinctrl *npcm = pinctrl_dev_get_drvdata(pctldev);
 
-	dev_dbg(npcm->dev, "set_mux: %d, %d[%s]\n", function, group,
+	dev_info(npcm->dev, "set_mux: %d, %d[%s]\n", function, group,
 		npcm7xx_groups[group].name);
 
 	npcm7xx_setfunc(npcm->gcr_regmap, npcm7xx_groups[group].pins,
@@ -1784,7 +1804,7 @@ static int npcm7xx_config_set_one(struct npcm7xx_pinctrl *npcm,
 		&npcm->gpio_bank[pin / NPCM7XX_GPIO_PER_BANK];
 	int gpio = BIT(pin % bank->gc.ngpio);
 
-	dev_dbg(bank->gc.parent, "param=%d %d[GPIO]\n", param, pin);
+	dev_info(bank->gc.parent, "param=%d %d[GPIO]\n", param, pin);
 	switch (param) {
 	case PIN_CONFIG_BIAS_DISABLE:
 		npcm_gpio_clr(&bank->gc, bank->base + NPCM7XX_GP_N_PU, gpio);
