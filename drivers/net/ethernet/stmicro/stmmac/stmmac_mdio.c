@@ -34,6 +34,22 @@
 #define MII_BUSY 0x00000001
 #define MII_WRITE 0x00000002
 
+/* mac mii controller bit */
+#define EMC_MCMDR_REG		0x90
+#define EMC_EnMDC     		BIT(19)
+
+#define EMC_MIID_REG		0x94
+
+#define EMC_MIIDA_REG		0x98
+#define EMC_PHYREG_SHIFT	0
+#define EMC_PHYREG_MASK		0x0000001F
+#define EMC_PHYAD_SHIFT		8
+#define EMC_PHYAD_MASK		0x00001F00
+#define EMC_PHYWR		BIT(16)
+#define EMC_PHYBUSY		BIT(17)
+#define EMC_MDCCR_SHIFT		20
+#define EMC_MDCCR_MASK		0x00F00000
+
 /* GMAC4 defines */
 #define MII_GMAC4_GOC_SHIFT		2
 #define MII_GMAC4_WRITE			(1 << MII_GMAC4_GOC_SHIFT)
@@ -57,28 +73,51 @@ static int stmmac_mdio_read(struct mii_bus *bus, int phyaddr, int phyreg)
 	unsigned int mii_data = priv->hw->mii.data;
 	u32 v;
 	int data;
-	u32 value = MII_BUSY;
 
-	value |= (phyaddr << priv->hw->mii.addr_shift)
-		& priv->hw->mii.addr_mask;
-	value |= (phyreg << priv->hw->mii.reg_shift) & priv->hw->mii.reg_mask;
-	value |= (priv->clk_csr << priv->hw->mii.clk_csr_shift)
-		& priv->hw->mii.clk_csr_mask;
-	if (priv->plat->has_gmac4)
-		value |= MII_GMAC4_READ;
+	if (priv->phy_ioaddr == NULL) {
+		u32 value = MII_BUSY;
 
-	if (readl_poll_timeout(priv->ioaddr + mii_address, v, !(v & MII_BUSY),
-			       100, 10000))
-		return -EBUSY;
+		value |= (phyaddr << priv->hw->mii.addr_shift)
+			& priv->hw->mii.addr_mask;
+		value |= (phyreg << priv->hw->mii.reg_shift) & priv->hw->mii.reg_mask;
+		value |= (priv->clk_csr << priv->hw->mii.clk_csr_shift)
+			& priv->hw->mii.clk_csr_mask;
+		if (priv->plat->has_gmac4)
+			value |= MII_GMAC4_READ;
 
-	writel(value, priv->ioaddr + mii_address);
+		if (readl_poll_timeout(priv->ioaddr + mii_address, v, !(v & MII_BUSY),
+				       100, 10000))
+			return -EBUSY;
 
-	if (readl_poll_timeout(priv->ioaddr + mii_address, v, !(v & MII_BUSY),
-			       100, 10000))
-		return -EBUSY;
+		writel(value, priv->ioaddr + mii_address);
 
-	/* Read the data from the MII data register */
-	data = (int)readl(priv->ioaddr + mii_data);
+		if (readl_poll_timeout(priv->ioaddr + mii_address, v, !(v & MII_BUSY),
+				       100, 10000))
+			return -EBUSY;
+
+		/* Read the data from the MII data register */
+		data = (int)readl(priv->ioaddr + mii_data);
+	}
+	else {
+		u32 value = EMC_PHYBUSY;
+
+		value |= (9 << EMC_MDCCR_SHIFT)        & EMC_MDCCR_MASK;
+		value |= (phyaddr << EMC_PHYAD_SHIFT)  & EMC_PHYAD_MASK;
+		value |= (phyreg  << EMC_PHYREG_SHIFT) & EMC_PHYREG_MASK;
+
+		if (readl_poll_timeout(priv->phy_ioaddr + EMC_MIIDA_REG, v, !(v & EMC_PHYBUSY),
+				       100, 10000))
+			return -EBUSY;
+
+		writel(value, priv->phy_ioaddr + EMC_MIIDA_REG);
+
+		if (readl_poll_timeout(priv->phy_ioaddr + EMC_MIIDA_REG, v, !(v & EMC_PHYBUSY),
+				       100, 10000))
+			return -EBUSY;
+
+		/* Read the data from the MII data register */
+		data = (int)readl(priv->phy_ioaddr + EMC_MIID_REG);
+	}
 
 	return data;
 }
@@ -99,31 +138,55 @@ static int stmmac_mdio_write(struct mii_bus *bus, int phyaddr, int phyreg,
 	unsigned int mii_address = priv->hw->mii.addr;
 	unsigned int mii_data = priv->hw->mii.data;
 	u32 v;
-	u32 value = MII_BUSY;
 
-	value |= (phyaddr << priv->hw->mii.addr_shift)
-		& priv->hw->mii.addr_mask;
-	value |= (phyreg << priv->hw->mii.reg_shift) & priv->hw->mii.reg_mask;
+	if (priv->phy_ioaddr == NULL) {
+		u32 value = MII_BUSY;
 
-	value |= (priv->clk_csr << priv->hw->mii.clk_csr_shift)
-		& priv->hw->mii.clk_csr_mask;
-	if (priv->plat->has_gmac4)
-		value |= MII_GMAC4_WRITE;
-	else
-		value |= MII_WRITE;
+		value |= (phyaddr << priv->hw->mii.addr_shift)
+			& priv->hw->mii.addr_mask;
+		value |= (phyreg << priv->hw->mii.reg_shift) & priv->hw->mii.reg_mask;
 
-	/* Wait until any existing MII operation is complete */
-	if (readl_poll_timeout(priv->ioaddr + mii_address, v, !(v & MII_BUSY),
-			       100, 10000))
-		return -EBUSY;
+		value |= (priv->clk_csr << priv->hw->mii.clk_csr_shift)
+			& priv->hw->mii.clk_csr_mask;
+		if (priv->plat->has_gmac4)
+			value |= MII_GMAC4_WRITE;
+		else
+			value |= MII_WRITE;
 
-	/* Set the MII address register to write */
-	writel(phydata, priv->ioaddr + mii_data);
-	writel(value, priv->ioaddr + mii_address);
+		/* Wait until any existing MII operation is complete */
+		if (readl_poll_timeout(priv->ioaddr + mii_address, v, !(v & MII_BUSY),
+				       100, 10000))
+			return -EBUSY;
 
-	/* Wait until any existing MII operation is complete */
-	return readl_poll_timeout(priv->ioaddr + mii_address, v, !(v & MII_BUSY),
-				  100, 10000);
+		/* Set the MII address register to write */
+		writel(phydata, priv->ioaddr + mii_data);
+		writel(value, priv->ioaddr + mii_address);
+
+		/* Wait until any existing MII operation is complete */
+		return readl_poll_timeout(priv->ioaddr + mii_address, v, !(v & MII_BUSY),
+					  100, 10000);
+	}
+	else {
+		u32 value = EMC_PHYBUSY;
+
+		value |= (9 << EMC_MDCCR_SHIFT)        & EMC_MDCCR_MASK;
+		value |= (phyaddr << EMC_PHYAD_SHIFT)  & EMC_PHYAD_MASK;
+		value |= (phyreg  << EMC_PHYREG_SHIFT) & EMC_PHYREG_MASK;
+		value |= EMC_PHYWR;
+
+		/* Wait until any existing MII operation is complete */
+		if (readl_poll_timeout(priv->phy_ioaddr + EMC_MIIDA_REG, v, !(v & EMC_PHYBUSY),
+				       100, 10000))
+			return -EBUSY;
+
+		/* Set the MII address register to write */
+		writel(phydata, priv->phy_ioaddr + EMC_MIID_REG);
+		writel(value, priv->phy_ioaddr + EMC_MIIDA_REG);
+
+		/* Wait until any existing MII operation is complete */
+		return readl_poll_timeout(priv->phy_ioaddr + EMC_MIIDA_REG, v, !(v & EMC_PHYBUSY),
+					  100, 10000);
+	}
 }
 
 /**
@@ -241,6 +304,9 @@ int stmmac_mdio_register(struct net_device *ndev)
 		dev_err(dev, "Cannot register the MDIO bus\n");
 		goto bus_register_fail;
 	}
+
+	if (priv->phy_ioaddr)
+		writel(readl(priv->phy_ioaddr + EMC_MCMDR_REG) | EMC_EnMDC, priv->phy_ioaddr + EMC_MCMDR_REG);
 
 	if (priv->plat->phy_node || mdio_node)
 		goto bus_register_done;

@@ -73,6 +73,7 @@
 			pinctrl-0 = <&r2_pins
 			             &r2err_pins
 				     &r2md_pins>;
+			status = "disabled";
 		};
 
 		udc0:udc@f0830000 {

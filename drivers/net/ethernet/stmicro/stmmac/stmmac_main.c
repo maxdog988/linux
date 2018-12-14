@@ -4294,6 +4294,10 @@ int stmmac_dvr_probe(struct device *device,
 	priv->pause = pause;
 	priv->plat = plat_dat;
 	priv->ioaddr = res->addr;
+
+	dev_info(priv->device, "res->phy_addr = %x\n", (unsigned int)res->phy_addr);
+	priv->phy_ioaddr = res->phy_addr;
+
 	priv->dev->base_addr = (unsigned long)res->addr;
 
 	priv->dev->irq = res->irq;

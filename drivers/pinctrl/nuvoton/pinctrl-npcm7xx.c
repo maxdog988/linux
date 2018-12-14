@@ -362,38 +362,12 @@ static struct irq_chip npcmgpio_irqchip = {
 
 /* pinmux handing in the pinctrl driver*/
 static const int smb0_pins[]  = { 115, 114 };
-static const int smb0b_pins[] = { 195, 194 };
-static const int smb0c_pins[] = { 202, 196 };
-static const int smb0d_pins[] = { 198, 199 };
-static const int smb0den_pins[] = { 197 };
-
 static const int smb1_pins[]  = { 117, 116 };
-static const int smb1b_pins[] = { 126, 127 };
-static const int smb1c_pins[] = { 124, 125 };
-static const int smb1d_pins[] = { 4, 5 };
-
 static const int smb2_pins[]  = { 119, 118 };
-static const int smb2b_pins[] = { 122, 123 };
-static const int smb2c_pins[] = { 120, 121 };
-static const int smb2d_pins[] = { 6, 7 };
-
 static const int smb3_pins[]  = { 30, 31 };
-static const int smb3b_pins[] = { 39, 40 };
-static const int smb3c_pins[] = { 37, 38 };
-static const int smb3d_pins[] = { 59, 60 };
-
 static const int smb4_pins[]  = { 28, 29 };
-static const int smb4b_pins[] = { 18, 19 };
-static const int smb4c_pins[] = { 20, 21 };
-static const int smb4d_pins[] = { 22, 23 };
-static const int smb4den_pins[] = { 17 };
-
 static const int smb5_pins[]  = { 26, 27 };
-static const int smb5b_pins[] = { 13, 12 };
-static const int smb5c_pins[] = { 15, 14 };
-static const int smb5d_pins[] = { 94, 93 };
 static const int ga20kbc_pins[] = { 94, 93 };
-
 static const int smb6_pins[]  = { 172, 171 };
 static const int smb7_pins[]  = { 174, 173 };
 static const int smb8_pins[]  = { 129, 128 };
@@ -524,6 +498,14 @@ static const int lkgpo2_pins[] = { 9 };
 
 static const int nprd_smi_pins[] = { 190 };
 
+static const int hgpio0_pins[] = { 20 };
+static const int hgpio1_pins[] = { 21 };
+static const int hgpio2_pins[] = { 22 };
+static const int hgpio3_pins[] = { 23 };
+static const int hgpio4_pins[] = { 24 };
+static const int hgpio5_pins[] = { 25 };
+static const int hgpio6_pins[] = { 59 };
+static const int hgpio7_pins[] = { 60 };
 /*
  * pin:	     name, number
  * group:    name, npins,   pins
@@ -537,31 +519,11 @@ struct npcm7xx_group {
 
 #define NPCM7XX_GRPS \
 	NPCM7XX_GRP(smb0), \
-	NPCM7XX_GRP(smb0b), \
-	NPCM7XX_GRP(smb0c), \
-	NPCM7XX_GRP(smb0d), \
-	NPCM7XX_GRP(smb0den), \
 	NPCM7XX_GRP(smb1), \
-	NPCM7XX_GRP(smb1b), \
-	NPCM7XX_GRP(smb1c), \
-	NPCM7XX_GRP(smb1d), \
 	NPCM7XX_GRP(smb2), \
-	NPCM7XX_GRP(smb2b), \
-	NPCM7XX_GRP(smb2c), \
-	NPCM7XX_GRP(smb2d), \
 	NPCM7XX_GRP(smb3), \
-	NPCM7XX_GRP(smb3b), \
-	NPCM7XX_GRP(smb3c), \
-	NPCM7XX_GRP(smb3d), \
 	NPCM7XX_GRP(smb4), \
-	NPCM7XX_GRP(smb4b), \
-	NPCM7XX_GRP(smb4c), \
-	NPCM7XX_GRP(smb4d), \
-	NPCM7XX_GRP(smb4den), \
 	NPCM7XX_GRP(smb5), \
-	NPCM7XX_GRP(smb5b), \
-	NPCM7XX_GRP(smb5c), \
-	NPCM7XX_GRP(smb5d), \
 	NPCM7XX_GRP(ga20kbc), \
 	NPCM7XX_GRP(smb6), \
 	NPCM7XX_GRP(smb7), \
@@ -651,6 +613,14 @@ struct npcm7xx_group {
 	NPCM7XX_GRP(lkgpo1), \
 	NPCM7XX_GRP(lkgpo2), \
 	NPCM7XX_GRP(nprd_smi), \
+	NPCM7XX_GRP(hgpio0), \
+	NPCM7XX_GRP(hgpio1), \
+	NPCM7XX_GRP(hgpio2), \
+	NPCM7XX_GRP(hgpio3), \
+	NPCM7XX_GRP(hgpio4), \
+	NPCM7XX_GRP(hgpio5), \
+	NPCM7XX_GRP(hgpio6), \
+	NPCM7XX_GRP(hgpio7), \
 	\
 
 enum {
@@ -680,31 +650,11 @@ struct npcm7xx_func {
 };
 
 NPCM7XX_SFUNC(smb0);
-NPCM7XX_SFUNC(smb0b);
-NPCM7XX_SFUNC(smb0c);
-NPCM7XX_SFUNC(smb0d);
-NPCM7XX_SFUNC(smb0den);
 NPCM7XX_SFUNC(smb1);
-NPCM7XX_SFUNC(smb1b);
-NPCM7XX_SFUNC(smb1c);
-NPCM7XX_SFUNC(smb1d);
 NPCM7XX_SFUNC(smb2);
-NPCM7XX_SFUNC(smb2b);
-NPCM7XX_SFUNC(smb2c);
-NPCM7XX_SFUNC(smb2d);
 NPCM7XX_SFUNC(smb3);
-NPCM7XX_SFUNC(smb3b);
-NPCM7XX_SFUNC(smb3c);
-NPCM7XX_SFUNC(smb3d);
 NPCM7XX_SFUNC(smb4);
-NPCM7XX_SFUNC(smb4b);
-NPCM7XX_SFUNC(smb4c);
-NPCM7XX_SFUNC(smb4d);
-NPCM7XX_SFUNC(smb4den);
 NPCM7XX_SFUNC(smb5);
-NPCM7XX_SFUNC(smb5b);
-NPCM7XX_SFUNC(smb5c);
-NPCM7XX_SFUNC(smb5d);
 NPCM7XX_SFUNC(ga20kbc);
 NPCM7XX_SFUNC(smb6);
 NPCM7XX_SFUNC(smb7);
@@ -794,35 +744,23 @@ NPCM7XX_SFUNC(lkgpo0);
 NPCM7XX_SFUNC(lkgpo1);
 NPCM7XX_SFUNC(lkgpo2);
 NPCM7XX_SFUNC(nprd_smi);
+NPCM7XX_SFUNC(hgpio0);
+NPCM7XX_SFUNC(hgpio1);
+NPCM7XX_SFUNC(hgpio2);
+NPCM7XX_SFUNC(hgpio3);
+NPCM7XX_SFUNC(hgpio4);
+NPCM7XX_SFUNC(hgpio5);
+NPCM7XX_SFUNC(hgpio6);
+NPCM7XX_SFUNC(hgpio7);
 
 /* Function names */
 static struct npcm7xx_func npcm7xx_funcs[] = {
 	NPCM7XX_MKFUNC(smb0),
-	NPCM7XX_MKFUNC(smb0b),
-	NPCM7XX_MKFUNC(smb0c),
-	NPCM7XX_MKFUNC(smb0d),
-	NPCM7XX_MKFUNC(smb0den),
 	NPCM7XX_MKFUNC(smb1),
-	NPCM7XX_MKFUNC(smb1b),
-	NPCM7XX_MKFUNC(smb1c),
-	NPCM7XX_MKFUNC(smb1d),
 	NPCM7XX_MKFUNC(smb2),
-	NPCM7XX_MKFUNC(smb2b),
-	NPCM7XX_MKFUNC(smb2c),
-	NPCM7XX_MKFUNC(smb2d),
 	NPCM7XX_MKFUNC(smb3),
-	NPCM7XX_MKFUNC(smb3b),
-	NPCM7XX_MKFUNC(smb3c),
-	NPCM7XX_MKFUNC(smb3d),
 	NPCM7XX_MKFUNC(smb4),
-	NPCM7XX_MKFUNC(smb4b),
-	NPCM7XX_MKFUNC(smb4c),
-	NPCM7XX_MKFUNC(smb4d),
-	NPCM7XX_MKFUNC(smb4den),
 	NPCM7XX_MKFUNC(smb5),
-	NPCM7XX_MKFUNC(smb5b),
-	NPCM7XX_MKFUNC(smb5c),
-	NPCM7XX_MKFUNC(smb5d),
 	NPCM7XX_MKFUNC(ga20kbc),
 	NPCM7XX_MKFUNC(smb6),
 	NPCM7XX_MKFUNC(smb7),
@@ -912,6 +850,14 @@ static struct npcm7xx_func npcm7xx_funcs[] = {
 	NPCM7XX_MKFUNC(lkgpo1),
 	NPCM7XX_MKFUNC(lkgpo2),
 	NPCM7XX_MKFUNC(nprd_smi),
+	NPCM7XX_MKFUNC(hgpio0),
+	NPCM7XX_MKFUNC(hgpio1),
+	NPCM7XX_MKFUNC(hgpio2),
+	NPCM7XX_MKFUNC(hgpio3),
+	NPCM7XX_MKFUNC(hgpio4),
+	NPCM7XX_MKFUNC(hgpio5),
+	NPCM7XX_MKFUNC(hgpio6),
+	NPCM7XX_MKFUNC(hgpio7),
 };
 
 #define NPCM7XX_PINCFG(a, b, c, d, e, f, g, h, i, j, k) \
@@ -948,28 +894,28 @@ static const struct npcm7xx_pincfg pincfg[] = {
 	NPCM7XX_PINCFG(1,	 iox1, MFSEL1, 30,	  none, NONE, 0,	none, NONE, 0,	     DS(8, 12)),
 	NPCM7XX_PINCFG(2,	 iox1, MFSEL1, 30,	  none, NONE, 0,	none, NONE, 0,	     DS(8, 12)),
 	NPCM7XX_PINCFG(3,	 iox1, MFSEL1, 30,	  none, NONE, 0,	none, NONE, 0,	     0),
-	NPCM7XX_PINCFG(4,	 iox2, MFSEL3, 14,	 smb1d, I2CSEGSEL, 7,	none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(5,	 iox2, MFSEL3, 14,	 smb1d, I2CSEGSEL, 7,	none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(6,	 iox2, MFSEL3, 14,	 smb2d, I2CSEGSEL, 10,  none, NONE, 0,       SLEW),
-	NPCM7XX_PINCFG(7,	 iox2, MFSEL3, 14,	 smb2d, I2CSEGSEL, 10,  none, NONE, 0,       SLEW),
+	NPCM7XX_PINCFG(4,	 iox2, MFSEL3, 14,	 none, NONE, 0,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(5,	 iox2, MFSEL3, 14,	 none, NONE, 0,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(6,	 iox2, MFSEL3, 14,	 none, NONE, 0,  none, NONE, 0,       SLEW),
+	NPCM7XX_PINCFG(7,	 iox2, MFSEL3, 14,	 none, NONE, 0,  none, NONE, 0,       SLEW),
 	NPCM7XX_PINCFG(8,      lkgpo1, FLOCKR1, 4,        none, NONE, 0,	none, NONE, 0,	     DS(8, 12)),
 	NPCM7XX_PINCFG(9,      lkgpo2, FLOCKR1, 8,        none, NONE, 0,	none, NONE, 0,	     DS(8, 12)),
 	NPCM7XX_PINCFG(10,	 ioxh, MFSEL3, 18,	  none, NONE, 0,	none, NONE, 0,	     DS(8, 12)),
 	NPCM7XX_PINCFG(11,	 ioxh, MFSEL3, 18,	  none, NONE, 0,	none, NONE, 0,	     DS(8, 12)),
-	NPCM7XX_PINCFG(12,	 gspi, MFSEL1, 24,	 smb5b, I2CSEGSEL, 19,  none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(13,	 gspi, MFSEL1, 24,	 smb5b, I2CSEGSEL, 19,  none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(14,	 gspi, MFSEL1, 24,	 smb5c, I2CSEGSEL, 20,	none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(15,	 gspi, MFSEL1, 24,	 smb5c, I2CSEGSEL, 20,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(12,	 gspi, MFSEL1, 24,	 none, NONE, 0,  none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(13,	 gspi, MFSEL1, 24,	 none, NONE, 0,  none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(14,	 gspi, MFSEL1, 24,	 none, NONE, 0,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(15,	 gspi, MFSEL1, 24,	 none, NONE, 0,	none, NONE, 0,	     SLEW),
 	NPCM7XX_PINCFG(16,     lkgpo0, FLOCKR1, 0,        none, NONE, 0,	none, NONE, 0,	     DS(8, 12)),
-	NPCM7XX_PINCFG(17,      pspi2, MFSEL3, 13,     smb4den, I2CSEGSEL, 23,  none, NONE, 0,       DS(8, 12)),
-	NPCM7XX_PINCFG(18,      pspi2, MFSEL3, 13,	 smb4b, I2CSEGSEL, 14,  none, NONE, 0,	     DS(8, 12)),
-	NPCM7XX_PINCFG(19,      pspi2, MFSEL3, 13,	 smb4b, I2CSEGSEL, 14,  none, NONE, 0,	     DS(8, 12)),
-	NPCM7XX_PINCFG(20,	smb4c, I2CSEGSEL, 15,    smb15, MFSEL3, 8,      none, NONE, 0,	     0),
-	NPCM7XX_PINCFG(21,	smb4c, I2CSEGSEL, 15,    smb15, MFSEL3, 8,      none, NONE, 0,	     0),
-	NPCM7XX_PINCFG(22,      smb4d, I2CSEGSEL, 16,	 smb14, MFSEL3, 7,      none, NONE, 0,	     0),
-	NPCM7XX_PINCFG(23,      smb4d, I2CSEGSEL, 16,	 smb14, MFSEL3, 7,      none, NONE, 0,	     0),
-	NPCM7XX_PINCFG(24,	 ioxh, MFSEL3, 18,	  none, NONE, 0,	none, NONE, 0,	     DS(8, 12)),
-	NPCM7XX_PINCFG(25,	 ioxh, MFSEL3, 18,	  none, NONE, 0,	none, NONE, 0,	     DS(8, 12)),
+	NPCM7XX_PINCFG(17,      pspi2, MFSEL3, 13,     none, NONE, 0,  none, NONE, 0,       DS(8, 12)),
+	NPCM7XX_PINCFG(18,      pspi2, MFSEL3, 13,	 none, NONE, 0,  none, NONE, 0,	     DS(8, 12)),
+	NPCM7XX_PINCFG(19,      pspi2, MFSEL3, 13,	 none, NONE, 0,  none, NONE, 0,	     DS(8, 12)),
+	NPCM7XX_PINCFG(20,	smb15, MFSEL3, 8,      hgpio0, MFSEL2, 24,	none, NONE, 0,		0),
+	NPCM7XX_PINCFG(21,	smb15, MFSEL3, 8,      hgpio1, MFSEL2, 25,	none, NONE, 0,	     0),
+	NPCM7XX_PINCFG(22,	smb14, MFSEL3, 7,      hgpio2, MFSEL2, 26,	none, NONE, 0,     0),
+	NPCM7XX_PINCFG(23,	smb14, MFSEL3, 7,      hgpio3, MFSEL2, 27,	none, NONE, 0,     0),
+	NPCM7XX_PINCFG(24,	 ioxh, MFSEL3, 18,	  hgpio4, MFSEL2, 28,	none, NONE, 0,	     DS(8, 12)),
+	NPCM7XX_PINCFG(25,	 ioxh, MFSEL3, 18,	  hgpio5, MFSEL2, 29,	none, NONE, 0,	     DS(8, 12)),
 	NPCM7XX_PINCFG(26,	 smb5, MFSEL1, 2,	  none, NONE, 0,	none, NONE, 0,	     0),
 	NPCM7XX_PINCFG(27,	 smb5, MFSEL1, 2,	  none, NONE, 0,	none, NONE, 0,	     0),
 	NPCM7XX_PINCFG(28,	 smb4, MFSEL1, 1,	  none, NONE, 0,	none, NONE, 0,	     0),
@@ -980,10 +926,10 @@ static const struct npcm7xx_pincfg pincfg[] = {
 	NPCM7XX_PINCFG(32,    spi0cs1, MFSEL1, 3,	  none, NONE, 0,	none, NONE, 0,	     0),
 	NPCM7XX_PINCFG(33,   none, NONE, 0,     none, NONE, 0,	none, NONE, 0,	     SLEW),
 	NPCM7XX_PINCFG(34,   none, NONE, 0,     none, NONE, 0,	none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(37,	smb3c, I2CSEGSEL, 12,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(38,	smb3c, I2CSEGSEL, 12,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(39,	smb3b, I2CSEGSEL, 11,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(40,	smb3b, I2CSEGSEL, 11,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(37,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(38,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(39,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(40,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
 	NPCM7XX_PINCFG(41,  bmcuart0a, MFSEL1, 9,         none, NONE, 0,	none, NONE, 0,	     0),
 	NPCM7XX_PINCFG(42,  bmcuart0a, MFSEL1, 9,         none, NONE, 0,	none, NONE, 0,	     DS(2, 4) | GPO),
 	NPCM7XX_PINCFG(43,      uart1, MFSEL1, 10,	 jtag2, MFSEL4, 0,  bmcuart1, MFSEL3, 24,    0),
@@ -1002,8 +948,8 @@ static const struct npcm7xx_pincfg pincfg[] = {
 	NPCM7XX_PINCFG(56,	r1err, MFSEL1, 12,	  none, NONE, 0,	none, NONE, 0,	     0),
 	NPCM7XX_PINCFG(57,       r1md, MFSEL1, 13,        none, NONE, 0,        none, NONE, 0,       DS(2, 4)),
 	NPCM7XX_PINCFG(58,       r1md, MFSEL1, 13,        none, NONE, 0,	none, NONE, 0,	     DS(2, 4)),
-	NPCM7XX_PINCFG(59,	smb3d, I2CSEGSEL, 13,	  none, NONE, 0,	none, NONE, 0,	     0),
-	NPCM7XX_PINCFG(60,	smb3d, I2CSEGSEL, 13,	  none, NONE, 0,	none, NONE, 0,	     0),
+	NPCM7XX_PINCFG(59,	hgpio7, MFSEL2, 30,	none, NONE, 0,	none, NONE, 0,     0),
+	NPCM7XX_PINCFG(60,	hgpio6, MFSEL2, 31,	none, NONE, 0,	none, NONE, 0,     0),
 	NPCM7XX_PINCFG(61,      uart1, MFSEL1, 10,	  none, NONE, 0,	none, NONE, 0,     GPO),
 	NPCM7XX_PINCFG(62,      uart1, MFSEL1, 10,    bmcuart1, MFSEL3, 24,	none, NONE, 0,     GPO),
 	NPCM7XX_PINCFG(63,      uart1, MFSEL1, 10,    bmcuart1, MFSEL3, 24,	none, NONE, 0,     GPO),
@@ -1037,8 +983,8 @@ static const struct npcm7xx_pincfg pincfg[] = {
 	NPCM7XX_PINCFG(90,      r2err, MFSEL1, 15,        none, NONE, 0,        none, NONE, 0,       0),
 	NPCM7XX_PINCFG(91,       r2md, MFSEL1, 16,	  none, NONE, 0,        none, NONE, 0,	     DS(2, 4)),
 	NPCM7XX_PINCFG(92,       r2md, MFSEL1, 16,	  none, NONE, 0,        none, NONE, 0,	     DS(2, 4)),
-	NPCM7XX_PINCFG(93,    ga20kbc, MFSEL1, 17,	 smb5d, I2CSEGSEL, 21,  none, NONE, 0,	     0),
-	NPCM7XX_PINCFG(94,    ga20kbc, MFSEL1, 17,	 smb5d, I2CSEGSEL, 21,  none, NONE, 0,	     0),
+	NPCM7XX_PINCFG(93,    ga20kbc, MFSEL1, 17,	 none, NONE, 0,  none, NONE, 0,	     0),
+	NPCM7XX_PINCFG(94,    ga20kbc, MFSEL1, 17,	 none, NONE, 0,  none, NONE, 0,	     0),
 	NPCM7XX_PINCFG(95,	  lpc, NONE, 0,		  espi, MFSEL4, 8,      gpio, MFSEL1, 26,    0),
 
 	NPCM7XX_PINCFG(96,	  rg1, MFSEL4, 22,	  none, NONE, 0,	none, NONE, 0,	     0),
@@ -1065,14 +1011,14 @@ static const struct npcm7xx_pincfg pincfg[] = {
 	NPCM7XX_PINCFG(117,	 smb1, MFSEL1, 7,	  none, NONE, 0,	none, NONE, 0,	     0),
 	NPCM7XX_PINCFG(118,	 smb2, MFSEL1, 8,	  none, NONE, 0,	none, NONE, 0,	     0),
 	NPCM7XX_PINCFG(119,	 smb2, MFSEL1, 8,	  none, NONE, 0,	none, NONE, 0,	     0),
-	NPCM7XX_PINCFG(120,	smb2c, I2CSEGSEL, 9,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(121,	smb2c, I2CSEGSEL, 9,      none, NONE, 0,	none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(122,	smb2b, I2CSEGSEL, 8,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(123,	smb2b, I2CSEGSEL, 8,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(124,	smb1c, I2CSEGSEL, 6,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(125,	smb1c, I2CSEGSEL, 6,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(126,	smb1b, I2CSEGSEL, 5,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(127,	smb1b, I2CSEGSEL, 5,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(120,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(121,	none, NONE, 0,    none, NONE, 0,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(122,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(123,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(124,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(125,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(126,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(127,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     SLEW),
 
 	NPCM7XX_PINCFG(128,	 smb8, MFSEL4, 11,	  none, NONE, 0,	none, NONE, 0,	     0),
 	NPCM7XX_PINCFG(129,	 smb8, MFSEL4, 11,	  none, NONE, 0,	none, NONE, 0,	     0),
@@ -1141,16 +1087,16 @@ static const struct npcm7xx_pincfg pincfg[] = {
 	NPCM7XX_PINCFG(191,	 none, NONE, 0,		  none, NONE, 0,	none, NONE, 0,	     DS(8, 12)),  /* XX */
 
 	NPCM7XX_PINCFG(192,	 none, NONE, 0,		  none, NONE, 0,	none, NONE, 0,	     DS(8, 12)),  /* XX */
-	NPCM7XX_PINCFG(193,	   r1, MFSEL3, 9,	  none, NONE, 0,	none, NONE, 0,	     0),
-	NPCM7XX_PINCFG(194,	smb0b, I2CSEGSEL, 0,	  none, NONE, 0,	none, NONE, 0,	     0),
-	NPCM7XX_PINCFG(195,	smb0b, I2CSEGSEL, 0,	  none, NONE, 0,	none, NONE, 0,	     0),
-	NPCM7XX_PINCFG(196,	smb0c, I2CSEGSEL, 1,	  none, NONE, 0,	none, NONE, 0,	     0),
-	NPCM7XX_PINCFG(197,   smb0den, I2CSEGSEL, 22,     none, NONE, 0,	none, NONE, 0,	     SLEW),
-	NPCM7XX_PINCFG(198,	smb0d, I2CSEGSEL, 2,	  none, NONE, 0,	none, NONE, 0,	     0),
-	NPCM7XX_PINCFG(199,	smb0d, I2CSEGSEL, 2,	  none, NONE, 0,	none, NONE, 0,	     0),
+	NPCM7XX_PINCFG(193,	r1, MFSEL3, 9,	  none, NONE, 0,	none, NONE, 0,	     0),
+	NPCM7XX_PINCFG(194,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     0),
+	NPCM7XX_PINCFG(195,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     0),
+	NPCM7XX_PINCFG(196,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     0),
+	NPCM7XX_PINCFG(197,	none, NONE, 0,     none, NONE, 0,	none, NONE, 0,	     SLEW),
+	NPCM7XX_PINCFG(198,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     0),
+	NPCM7XX_PINCFG(199,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     0),
 	NPCM7XX_PINCFG(200,        r2, MFSEL1, 14,        none, NONE, 0,        none, NONE, 0,       0),
 	NPCM7XX_PINCFG(201,	   r1, MFSEL3, 9,	  none, NONE, 0,	none, NONE, 0,	     0),
-	NPCM7XX_PINCFG(202,	smb0c, I2CSEGSEL, 1,	  none, NONE, 0,	none, NONE, 0,	     0),
+	NPCM7XX_PINCFG(202,	none, NONE, 0,	  none, NONE, 0,	none, NONE, 0,	     0),
 	NPCM7XX_PINCFG(203,    faninx, MFSEL3, 3,         none, NONE, 0,	none, NONE, 0,	     DS(8, 12)),
 	NPCM7XX_PINCFG(204,	  ddc, NONE, 0,           gpio, MFSEL3, 22,	none, NONE, 0,	     SLEW),
 	NPCM7XX_PINCFG(205,	  ddc, NONE, 0,           gpio, MFSEL3, 22,	none, NONE, 0,	     SLEW),
@@ -1192,28 +1138,28 @@ static const struct pinctrl_pin_desc npcm7xx_pins[] = {
 	PINCTRL_PIN(1,	"GPIO1/IOX1LD"),
 	PINCTRL_PIN(2,	"GPIO2/IOX1CK"),
 	PINCTRL_PIN(3,	"GPIO3/IOX1D0"),
-	PINCTRL_PIN(4,	"GPIO4/IOX2DI/SMB1DSDA"),
-	PINCTRL_PIN(5,	"GPIO5/IOX2LD/SMB1DSCL"),
-	PINCTRL_PIN(6,	"GPIO6/IOX2CK/SMB2DSDA"),
-	PINCTRL_PIN(7,	"GPIO7/IOX2D0/SMB2DSCL"),
+	PINCTRL_PIN(4,	"GPIO4/IOX2DI"),
+	PINCTRL_PIN(5,	"GPIO5/IOX2LD"),
+	PINCTRL_PIN(6,	"GPIO6/IOX2CK"),
+	PINCTRL_PIN(7,	"GPIO7/IOX2D0"),
 	PINCTRL_PIN(8,	"GPIO8/LKGPO1"),
 	PINCTRL_PIN(9,	"GPIO9/LKGPO2"),
 	PINCTRL_PIN(10, "GPIO10/IOXHLD"),
 	PINCTRL_PIN(11, "GPIO11/IOXHCK"),
-	PINCTRL_PIN(12, "GPIO12/GSPICK/SMB5BSCL"),
-	PINCTRL_PIN(13, "GPIO13/GSPIDO/SMB5BSDA"),
-	PINCTRL_PIN(14, "GPIO14/GSPIDI/SMB5CSCL"),
-	PINCTRL_PIN(15, "GPIO15/GSPICS/SMB5CSDA"),
+	PINCTRL_PIN(12, "GPIO12/GSPICK"),
+	PINCTRL_PIN(13, "GPIO13/GSPIDO"),
+	PINCTRL_PIN(14, "GPIO14/GSPIDI"),
+	PINCTRL_PIN(15, "GPIO15/GSPICS"),
 	PINCTRL_PIN(16, "GPIO16/LKGPO0"),
-	PINCTRL_PIN(17, "GPIO17/PSPI2DI/SMB4DEN"),
-	PINCTRL_PIN(18, "GPIO18/PSPI2D0/SMB4BSDA"),
-	PINCTRL_PIN(19, "GPIO19/PSPI2CK/SMB4BSCL"),
-	PINCTRL_PIN(20, "GPIO20/SMB4CSDA/SMB15SDA"),
-	PINCTRL_PIN(21, "GPIO21/SMB4CSCL/SMB15SCL"),
-	PINCTRL_PIN(22, "GPIO22/SMB4DSDA/SMB14SDA"),
-	PINCTRL_PIN(23, "GPIO23/SMB4DSCL/SMB14SCL"),
-	PINCTRL_PIN(24, "GPIO24/IOXHDO"),
-	PINCTRL_PIN(25, "GPIO25/IOXHDI"),
+	PINCTRL_PIN(17, "GPIO17/PSPI2DI"),
+	PINCTRL_PIN(18, "GPIO18/PSPI2D0"),
+	PINCTRL_PIN(19, "GPIO19/PSPI2CK"),
+	PINCTRL_PIN(20, "GPIO20/SMB15SDA/HGPIO0"),
+	PINCTRL_PIN(21, "GPIO21/SMB15SCL/HGPIO1"),
+	PINCTRL_PIN(22, "GPIO22/SMB14SDA/HGPIO2"),
+	PINCTRL_PIN(23, "GPIO23/SMB14SCL/HGPIO3"),
+	PINCTRL_PIN(24, "GPIO24/IOXHDO/HGPIO4"),
+	PINCTRL_PIN(25, "GPIO25/IOXHDI/HGPIO5"),
 	PINCTRL_PIN(26, "GPIO26/SMB5SDA"),
 	PINCTRL_PIN(27, "GPIO27/SMB5SCL"),
 	PINCTRL_PIN(28, "GPIO28/SMB4SDA"),
@@ -1224,10 +1170,10 @@ static const struct pinctrl_pin_desc npcm7xx_pins[] = {
 	PINCTRL_PIN(32, "GPIO32/nSPI0CS1"),
 	PINCTRL_PIN(33, "SPI0D2"),
 	PINCTRL_PIN(34, "SPI0D3"),
-	PINCTRL_PIN(37, "GPIO37/SMB3CSDA"),
-	PINCTRL_PIN(38, "GPIO38/SMB3CSCL"),
-	PINCTRL_PIN(39, "GPIO39/SMB3BSDA"),
-	PINCTRL_PIN(40, "GPIO40/SMB3BSCL"),
+	PINCTRL_PIN(37, "GPIO37"),
+	PINCTRL_PIN(38, "GPIO38"),
+	PINCTRL_PIN(39, "GPIO39"),
+	PINCTRL_PIN(40, "GPIO40"),
 	PINCTRL_PIN(41, "GPIO41/BSPRXD"),
 	PINCTRL_PIN(42, "GPO42/BSPTXD/STRAP11"),
 	PINCTRL_PIN(43, "GPIO43/RXD1/JTMS2/BU1RXD"),
@@ -1246,8 +1192,8 @@ static const struct pinctrl_pin_desc npcm7xx_pins[] = {
 	PINCTRL_PIN(56, "GPIO56/R1RXERR"),
 	PINCTRL_PIN(57, "GPIO57/R1MDC"),
 	PINCTRL_PIN(58, "GPIO58/R1MDIO"),
-	PINCTRL_PIN(59, "GPIO59/SMB3DSDA"),
-	PINCTRL_PIN(60, "GPIO60/SMB3DSCL"),
+	PINCTRL_PIN(59, "GPIO59/HGPIO6"),
+	PINCTRL_PIN(60, "GPIO60/HGPIO7"),
 	PINCTRL_PIN(61, "GPO61/nDTR1_BOUT1/STRAP6"),
 	PINCTRL_PIN(62, "GPO62/nRTST1/STRAP5"),
 	PINCTRL_PIN(63, "GPO63/TXD1/STRAP4"),
@@ -1281,8 +1227,8 @@ static const struct pinctrl_pin_desc npcm7xx_pins[] = {
 	PINCTRL_PIN(90, "GPIO90/R2RXERR"),
 	PINCTRL_PIN(91, "GPIO91/R2MDC"),
 	PINCTRL_PIN(92, "GPIO92/R2MDIO"),
-	PINCTRL_PIN(93, "GPIO93/GA20/SMB5DSCL"),
-	PINCTRL_PIN(94, "GPIO94/nKBRST/SMB5DSDA"),
+	PINCTRL_PIN(93, "GPIO93/GA20"),
+	PINCTRL_PIN(94, "GPIO94/nKBRST"),
 	PINCTRL_PIN(95, "GPIO95/nLRESET/nESPIRST"),
 
 	PINCTRL_PIN(96, "GPIO96/RG1TXD0"),
@@ -1309,14 +1255,14 @@ static const struct pinctrl_pin_desc npcm7xx_pins[] = {
 	PINCTRL_PIN(117, "GPIO117/SMB1SDA"),
 	PINCTRL_PIN(118, "GPIO118/SMB2SCL"),
 	PINCTRL_PIN(119, "GPIO119/SMB2SDA"),
-	PINCTRL_PIN(120, "GPIO120/SMB2CSDA"),
-	PINCTRL_PIN(121, "GPIO121/SMB2CSCL"),
-	PINCTRL_PIN(122, "GPIO122/SMB2BSDA"),
-	PINCTRL_PIN(123, "GPIO123/SMB2BSCL"),
-	PINCTRL_PIN(124, "GPIO124/SMB1CSDA"),
-	PINCTRL_PIN(125, "GPIO125/SMB1CSCL"),
-	PINCTRL_PIN(126, "GPIO126/SMB1BSDA"),
-	PINCTRL_PIN(127, "GPIO127/SMB1BSCL"),
+	PINCTRL_PIN(120, "GPIO120"),
+	PINCTRL_PIN(121, "GPIO121"),
+	PINCTRL_PIN(122, "GPIO122"),
+	PINCTRL_PIN(123, "GPIO123"),
+	PINCTRL_PIN(124, "GPIO124"),
+	PINCTRL_PIN(125, "GPIO125"),
+	PINCTRL_PIN(126, "GPIO126"),
+	PINCTRL_PIN(127, "GPIO127"),
 
 	PINCTRL_PIN(128, "GPIO128/SMB8SCL"),
 	PINCTRL_PIN(129, "GPIO129/SMB8SDA"),
@@ -1386,15 +1332,15 @@ static const struct pinctrl_pin_desc npcm7xx_pins[] = {
 
 	PINCTRL_PIN(192, "GPIO192"),
 	PINCTRL_PIN(193, "GPIO193/R1CRSDV"),
-	PINCTRL_PIN(194, "GPIO194/SMB0BSCL"),
-	PINCTRL_PIN(195, "GPIO195/SMB0BSDA"),
-	PINCTRL_PIN(196, "GPIO196/SMB0CSCL"),
-	PINCTRL_PIN(197, "GPIO197/SMB0DEN"),
-	PINCTRL_PIN(198, "GPIO198/SMB0DSDA"),
-	PINCTRL_PIN(199, "GPIO199/SMB0DSCL"),
+	PINCTRL_PIN(194, "GPIO194"),
+	PINCTRL_PIN(195, "GPIO195"),
+	PINCTRL_PIN(196, "GPIO196"),
+	PINCTRL_PIN(197, "GPIO197"),
+	PINCTRL_PIN(198, "GPIO198"),
+	PINCTRL_PIN(199, "GPIO199"),
 	PINCTRL_PIN(200, "GPIO200/R2CK"),
 	PINCTRL_PIN(201, "GPIO201/R1CK"),
-	PINCTRL_PIN(202, "GPIO202/SMB0CSDA"),
+	PINCTRL_PIN(202, "GPIO202"),
 	PINCTRL_PIN(203, "GPIO203/FANIN16"),
 	PINCTRL_PIN(204, "GPIO204/DDC2SCL"),
 	PINCTRL_PIN(205, "GPIO205/DDC2SDA"),

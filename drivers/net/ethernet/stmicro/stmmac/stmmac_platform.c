@@ -642,6 +642,10 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	stmmac_res->addr = devm_ioremap_resource(&pdev->dev, res);
 
+	res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
+	if (res)
+		stmmac_res->phy_addr = devm_ioremap_resource(&pdev->dev, res);
+
 	return PTR_ERR_OR_ZERO(stmmac_res->addr);
 }
 EXPORT_SYMBOL_GPL(stmmac_get_platform_resources);

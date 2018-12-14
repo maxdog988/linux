@@ -36,6 +36,7 @@ struct stmmac_resources {
 	int wol_irq;
 	int lpi_irq;
 	int irq;
+	void __iomem *phy_addr;
 };
 
 struct stmmac_tx_info {
@@ -94,6 +95,7 @@ struct stmmac_priv {
 	int hwts_rx_en;
 
 	void __iomem *ioaddr;
+	void __iomem *phy_ioaddr;
 	struct net_device *dev;
 	struct device *device;
 	struct mac_device_info *hw;

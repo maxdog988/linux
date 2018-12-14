@@ -1,0 +1,643 @@
+// SPDX-License-Identifier: GPL-2.0
+// Copyright (c) 2018 Nuvoton Technology tomer.maimon@nuvoton.com
+// Copyright 2018 Google, Inc.
+
+/dts-v1/;
+#include "nuvoton-npcm750.dtsi"
+
+/ {
+	model = "Nuvoton npcm750 Development Board (Device Tree)";
+	compatible = "nuvoton,npcm750";
+
+	aliases {
+		ethernet0 = &emc0;
+		ethernet1 = &gmac0;
+		serial0 = &serial0;
+		serial1 = &serial1;
+		serial2 = &serial2;
+		serial3 = &serial3;
+		udc0 = &udc0;
+		udc1 = &udc1;
+		udc2 = &udc2;
+		udc3 = &udc3;
+		udc4 = &udc4;
+		udc5 = &udc5;
+		udc6 = &udc6;
+		udc7 = &udc7;
+		udc8 = &udc8;
+		udc9 = &udc9;
+		emmc0 = &sdhci0;
+		i2c0 = &i2c0;
+		i2c1 = &i2c1;
+		i2c2 = &i2c2;
+		i2c3 = &i2c3;
+		i2c4 = &i2c4;
+		i2c5 = &i2c5;
+		i2c6 = &i2c6;
+		i2c7 = &i2c7;
+		i2c8 = &i2c8;
+		i2c9 = &i2c9;
+		i2c10 = &i2c10;
+		i2c11 = &i2c11;
+		i2c12 = &i2c12;
+		i2c13 = &i2c13;
+		i2c14 = &i2c14;
+		i2c15 = &i2c15;
+		spi0 = &spi0;
+		spi1 = &spi1;
+		fiu0 = &fiu0;
+		fiu1 = &fiu3;
+		fiu2 = &fiux;
+	};
+
+	chosen {
+		stdout-path = &serial3;
+	};
+
+	memory {
+		reg = <0 0x40000000>;
+	};
+
+	ahb {
+	    gmac0: eth@f0802000 {
+			reg = <0xf0802000 0x2000
+			       0xf0826000 0x0304>;
+			phy-mode = "rgmii-id";
+			pinctrl-0 = <&rg1_pins
+			             &r2md_pins>;
+			status = "okay";
+		};
+
+		emc0: eth@f0825000 {
+			phy-mode = "rmii";
+			#use-ncsi; /* add this to support ncsi */
+			status = "okay";
+		};
+
+		ehci1: usb@f0806000 {
+			status = "okay";
+		};
+
+		ohci1: ohci@f0807000 {
+			status = "okay";
+		};
+
+		udc0:udc@f0830000 {
+			status = "okay";
+		};
+
+		udc1:udc@f0831000 {
+			status = "okay";
+		};
+
+		udc2:udc@f0832000 {
+			status = "okay";
+		};
+
+		udc3:udc@f0833000 {
+			status = "okay";
+		};
+
+		udc4:udc@f0834000 {
+			status = "okay";
+		};
+
+		udc5:udc@f0835000 {
+			status = "okay";
+		};
+
+		udc6:udc@f0836000 {
+			status = "okay";
+		};
+
+		udc7:udc@f0837000 {
+			status = "okay";
+		};
+
+		udc8:udc@f0838000 {
+			status = "okay";
+		};
+
+		udc9:udc@f0839000 {
+			status = "okay";
+		};
+
+		aes:aes@f0858000 {
+			status = "okay";
+		};
+
+		sha:sha@f085a000 {
+			status = "okay";
+		};
+
+		fiu0: fiu@fb000000 {
+			status = "okay";
+			spi-nor@0 {
+				compatible = "jedec,spi-nor";
+				#address-cells = <1>;
+				#size-cells = <1>;
+				spi-rx-bus-width = <2>;
+				reg = <0>;				
+				partitions@80000000 {
+					compatible = "fixed-partitions";
+					#address-cells = <1>;
+					#size-cells = <1>;
+					bbuboot1@0 {
+						label = "bb-uboot-1";
+						reg = <0x0000000 0x80000>;
+						read-only;
+						};
+					bbuboot2@80000 {
+						label = "bb-uboot-2";
+						reg = <0x0080000 0x80000>;
+						read-only;
+						};
+					envparam@100000 {
+						label = "env-param";
+						reg = <0x0100000 0x40000>;
+						read-only;
+						};
+					spare@140000 {
+						label = "spare";
+						reg = <0x0140000 0xC0000>;
+						};
+					kernel@200000 {
+						label = "kernel";
+						reg = <0x0200000 0x400000>;
+						};
+					rootfs@600000 {
+						label = "rootfs";
+						reg = <0x0600000 0x700000>;
+						};
+					spare1@D00000 {
+						label = "spare1";
+						reg = <0x0D00000 0x200000>;
+						};
+					spare2@0F00000 {
+						label = "spare2";
+						reg = <0x0F00000 0x200000>;
+						};
+					spare3@1100000 {
+						label = "spare3";
+						reg = <0x1100000 0x200000>;
+						};
+					spare4@1300000 {
+						label = "spare4";
+						reg = <0x1300000 0x0>;
+					};
+				};
+			};
+			/*spi-nor@1 {
+				partitions@88000000 {
+					compatible = "fixed-partitions";
+					#address-cells = <1>;
+					#size-cells = <1>;
+					spare1@0 {
+						label = "spi0-cs1-spare1";
+						reg = <0x0 0x2000000>;
+					};
+					spare2@800000 {
+						label = "spi0S-cs1-spare2";
+						reg = <0x2000000 0x0>;
+					};
+				};
+			};*/
+		};
+
+		fiu3: fiu@c0000000 {
+			status = "okay";
+			spi-nor@0 {
+				compatible = "jedec,spi-nor";
+				#address-cells = <1>;
+				#size-cells = <1>;
+				spi-rx-bus-width = <2>;
+				reg = <0>;				
+				partitions@A0000000 {
+					compatible = "fixed-partitions";
+					#address-cells = <1>;
+					#size-cells = <1>;
+					system1@0 {
+						label = "spi3-system1";
+						reg = <0x0 0x800000>;
+					};
+					system2@800000 {
+						label = "spi3-system2";
+						reg = <0x800000 0x0>;
+					};
+				};
+			};
+		};
+
+
+		sdhci0: sdhci@f0842000 {
+			status = "okay";
+		};
+
+		pcimbox: pcimbox@f0848000 {
+			status = "okay";
+		};
+
+		vcd: vcd@f0810000 {
+			status = "okay";
+		};
+
+		ece: ece@f0820000 {
+			status = "okay";
+		};
+
+		apb {
+
+			watchdog1: watchdog@901C {
+				status = "okay";
+			};
+
+			rng: rng@b000 {
+				status = "okay";
+			};
+
+			serial0: serial@1000 {
+				status = "okay";
+			};
+
+			serial1: serial@2000 {
+				status = "okay";
+			};
+
+			serial2: serial@3000 {
+				status = "okay";
+			};
+
+			serial3: serial@4000 {
+				status = "okay";
+			};
+
+			otp:otp@189000 {
+				status = "okay";
+			};
+
+			lpc_kcs: lpc_kcs@7000 {
+				kcs1: kcs1@0 {
+					status = "okay";
+				};
+
+				kcs2: kcs2@0 {
+					status = "okay";
+				};
+
+				kcs3: kcs3@0 {
+					status = "okay";
+				};
+			};
+
+			lpc_host: lpc_host@7000 {
+				lpc_bpc: lpc_bpc@40 {
+					monitor-ports = <0x80>;
+					status = "okay";
+				};
+			};
+
+			i2c0: i2c-bus@80000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				bus-frequency = <100000>;
+				status = "disabled";
+			};
+
+			i2c1: i2c-bus@81000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				bus-frequency = <100000>;
+				status = "okay";
+			};
+
+			i2c2: i2c-bus@82000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				bus-frequency = <100000>;
+				status = "okay";
+			};
+
+			i2c3: i2c-bus@83000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				bus-frequency = <100000>;
+				status = "disabled";
+			};
+
+			i2c4: i2c-bus@84000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				bus-frequency = <100000>;
+				status = "okay";
+			};
+
+			i2c5: i2c-bus@85000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				bus-frequency = <100000>;
+				status = "okay";
+			};
+
+			i2c6: i2c-bus@86000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				bus-frequency = <100000>;
+				status = "okay";
+			};
+
+			i2c7: i2c-bus@87000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				bus-frequency = <100000>;
+				status = "okay";
+			};
+
+			i2c8: i2c-bus@88000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				bus-frequency = <100000>;
+				status = "okay";
+			};
+
+			i2c9: i2c-bus@89000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				bus-frequency = <100000>;
+				status = "okay";
+			};
+
+			i2c10: i2c-bus@8a000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				bus-frequency = <100000>;
+				status = "okay";
+			};
+
+			i2c11: i2c-bus@8b000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				bus-frequency = <100000>;
+				status = "okay";
+			};
+
+			i2c12: i2c-bus@8c000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				bus-frequency = <100000>;
+				status = "okay";
+			};
+
+			i2c13: i2c-bus@8d000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				bus-frequency = <100000>;
+				status = "okay";
+				lm75@94 {
+					compatible = "lm75";
+					reg = <0x4A>;
+					status = "okay";
+				};
+				m24128@A2 {
+					compatible = "m24128";
+					reg = <0x51>;
+					status = "okay";
+				};
+				 ATtiny1634@A7 {
+					compatible = " ATtiny1634";
+					reg = <0x52>;
+					status = "disabled";
+				};
+			};
+
+			i2c14: i2c-bus@8e000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				bus-frequency = <100000>;
+				status = "disabled";
+			};
+
+			i2c15: i2c-bus@8f000 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				bus-frequency = <100000>;
+				status = "disabled";
+			};
+
+			pwm_fan:pwm-fan-controller@103000 {
+				status = "okay";
+				fan@0 {
+					reg = <0x00>;
+					fan-tach-ch = /bits/ 8 <0x00 0x01>;
+					cooling-levels = <127 255>;
+				};
+				fan@1 {
+					reg = <0x01>;
+					fan-tach-ch = /bits/ 8 <0x02 0x03>;
+					cooling-levels = /bits/ 8 <127 255>;
+				};
+				fan@2 {
+					reg = <0x02>;
+					fan-tach-ch = /bits/ 8 <0x04 0x05>;
+					cooling-levels = /bits/ 8 <127 255>;
+				};
+				fan@3 {
+					reg = <0x03>;
+					fan-tach-ch = /bits/ 8 <0x06 0x07>;
+					cooling-levels = /bits/ 8 <127 255>;
+				};
+				fan@4 {
+					reg = <0x04>;
+					fan-tach-ch = /bits/ 8 <0x08 0x09>;
+					cooling-levels = /bits/ 8 <127 255>;
+				};
+				fan@5 {
+					reg = <0x05>;
+					fan-tach-ch = /bits/ 8 <0x0A 0x0B>;
+					cooling-levels = /bits/ 8 <127 255>;
+				};
+				fan@6 {
+					reg = <0x06>;
+					fan-tach-ch = /bits/ 8 <0x0C 0x0D>;
+					cooling-levels = /bits/ 8 <127 255>;
+				};
+				fan@7 {
+					reg = <0x07>;
+					fan-tach-ch = /bits/ 8 <0x0E 0x0F>;
+					cooling-levels = /bits/ 8 <127 255>;
+				};
+			};
+
+			spi0: spi@200000 {
+				status = "okay";
+			};
+		};
+	};
+
+	pinctrl: pinctrl@f0800000 {
+		pinctrl-names = "default";
+		pinctrl-0 = < &gpio5_pins	/* FM_CPU0_BMC_PROCHOT_LVT3_N */
+				&gpio4_pins			/* FM_CPU1_PROCHOT_BMC_N */
+				&gpio7_pins			/* PVCCIN_CPU0_VRHOT_BMC_N */
+				&gpio6_pins			/* PVCCIN_CPU1_VRHOT_BMC_N */
+				&bmcuart0a_pins		/* BSPR(T)XD/BMC_COM5_UART_R(T)X_R */
+				&uart1_pins			/* GPIO43/RXD1 GPIO63/TXD1 */
+				&uart2_pins			/* GPIO49/RXD2 GPIO48/TXD2 */
+				&gpio10_pins		/* H_CPU0_FAST_BMC_WAKE_N */
+				&gpio11_pins		/* FM_CPU_ERR0_LVT3_N */
+				&gpio24_pins		/* FM_CPU_ERR1_LVT3_N */
+				&gpio25_pins		/* FM_CPU_ERR2_LVT3_N */
+				&gpio82_pins		/* IRQ_HSC_FAULT_N */
+				&gpio144_pins		/* FM_CPU0_THERMTRIP_BMC_N */
+				&gpio146_pins		/* FM_CPU1_THERMTRIP_BMC_N */
+				&gpio83_pins		/* FM_PWRBTN_BMC_IN_N/PWM3_DISABLE */
+				&gpio145_pins		/* RST_SYSTEM_BTN_BMC_IN_N/PWM5_DISABLE */
+				&gpio147_pins		/* FM_UART_PI7C9X1172_1_ALT_N_R/PWM7_DISABLE */
+				&gpio76_pins		/* BMC_NODE_ID_2_R FMIN12_DISABLE */
+				&gpio77_pins		/* BMC_NODE_ID_3_R FMIN13_DISABLE */
+				&gpio78_pins		/* BMC_XDP_OBSFN_R1_A0 FMIN14_DISABLE */
+				&gpio79_pins		/* BMC_XDP_OBSFN_A1 FMIN15_DISABLE */
+				&gpio31_pins		/* PSU1_THROTTLE_N/SMB3_DISABLE */
+				&gpio30_pins		/* POWER_FAIL_BMC_N/SMB3_DISABLE*/
+				&gpio23_pins		/* PWRGD_PCH_BMC_PWROK SMB14_DISABLE  */
+				&gpio22ol_pins		/* TCK_MUX_SEL SMB14_DISABLE  */
+				&gpio21_pins		/* FM_UARTSW_LSB_N SMB15_DISABLE  */
+				&gpio20_pins		/* FM_UARTSW_MSB_N SMB15_DISABLE  */
+				&gpio114ol_pins		/* BMC_PWRCAP_N SMB0_DISABLE */
+				&gpio115_pins		/* IRQ_BMC_PCH_NMI_STBY_N SMB0_DISABLE */
+				&ddc_pins			/* HSYNC2 VSYNC2 DDC2_SCL DDC2_SDA */
+				&gpio203o_pins		/* GPIO Output High (Module or MB SPI-to-UART) */
+				&gpio84_pins		/* IRQ_SML0_ALERT_N */
+				&gpio85ol_pins		/* BMC_FORCE_NM_THROTTLE_R1_N */
+				&gpio86ol_pins		/* FM_FORCE_ADR_BMC */
+				&gpio87_pins		/* BMC_NODE_ID_0_R */
+				&gpio88_pins		/* BMC_NODE_ID_1_R */
+				&gpio89_pins		/* HSC_GPIO1_BMC_N */
+				&gpio90_pins		/* HSC_GPIO2_BMC_N */
+				&gpio200_pins		/* SMB_BMC_MM13_ALT_N */
+				&gpio136_pins		/* BMC_XDP_CPU_PWR_DEBUG_N */
+				&gpio137_pins		/* FM_SLPS4_N */
+				&gpio138_pins		/* FM_SLPS3_N */
+				&gpio139_pins		/* FM_BMC_NMI_N */
+				&gpio140_pins		/* IRQ_DIMM_SAVE_LVT3_N */
+				&gpio141_pins		/* FM_POST_CARD_PRES_BMC_N */
+				&gpio142_pins		/* FM_ADR_COMPLETE */
+				&gpio143_pins		/* FM_THROTTLE_IN_N */
+				&gpio188ol_pins		/* RST_IOEXP_G2_N_R */
+				&gpio189_pins		/* SMB_ALERT_IOEXP_G2_N */
+				&gpio225ol_pins		/* FM_BACKUP_BIOS_SEL */
+				&gpio226ol_pins		/* BMC_SELF_HW_RST */
+				&gpio229ol_pins		/* BMC_XDP_SYSPWROK */
+				&gpio230_pins		/* FM_SYS_THROTTLE_N */
+				&gpio224_pins		/* SMB_ALERT_IOEXP_G1_N */
+				&gpio228ol_pins		/* RST_IOEXP_G1_N */
+				&gpio227ol_pins		/* FM_BIOS_SPI_BMC_CTRL */
+				&gpio199o_pins
+				&gpio202_pins		/* IRQ_PCH_LOM_ALERT_N */
+				&gpio127o_pins
+				&gpio198o_pins
+				&gpio124_pins		/* FM_CPU0_FIVR_FAULT_LVT3_R_N */
+				&gpio125_pins		/* FM_CPU1_FIVR_FAULT_LVT3_R_N */
+				&gpio126_pins		/* VOLTAGE_ALERT_R1_N */
+				&gpio93_pins		/* CURRENT_ALERT_R1_N */
+				&wdog1_pins
+				&wdog2_pins
+				&gpio160o_pins		/* FM_BMC_ONCTL_R_N */
+				&gpio169o_pins		/* LPC_PME_BMC_N */
+				&gpio231ol_pins		/* BMC_XDP_PRSNT_OUT_N */
+				&lkgpo1_pins
+				&gpio196_pins		/* BMC_NODE_ID_4_R */
+				&gpio197_pins		/* BMC_NODE_ID_5_R */
+				&gpio155_pins		/* BMC_XDP_RSMRST_N */
+				&gpio153ol_pins		/* BMC_XDP_CPU_PWR_DEBUG_N */
+				&gpio59_pins		/* BMC_XDP_PRSNT_IN_N */
+				&gpio40ol_pins		/* BMC_XDP_JTAG_SEL_N */
+				&gpio122_pins		/* FM_CPU_BMC_MSMI_CATERR_BMC_N */
+				&gpio121_pins		/* BMC_XDP_ITP_PMODE */
+				&gpio120_pins		/* FM_BIOS_SMI_ACTIVE_N */
+				&gpio123_pins		/* IRQ_OOB_MGMT_RISER_ALERT_N */
+				&lpc_pins
+				&gpio168_pins
+				&gpio12ol_pins
+				&gpio13ol_pins
+				&gpio14ol_pins
+				&gpio15ol_pins
+				&gpio39_pins		/* Use as INT from TMP75AIDR on I2C13 */
+				&gpio208_pins
+				&gpio209ol_pins
+				&gpio112ol_pins
+				&gpio113ol_pins
+				&gpio209ol_pins
+				&gpio210ol_pins
+				&gpio211ol_pins
+				&gpio212ol_pins
+				&gpio213ol_pins
+				&gpio214ol_pins
+				&gpio215ol_pins
+				&gpio216ol_pins
+				&gpio217ol_pins
+				&gpio9ol_pins
+				&gpio94ol_pins		/* RGMII CLK (depop R2797 on MB) */
+				&gpio108ol_pins
+				&gpio109ol_pins
+				&gpio110ol_pins		/* Use for ARM HEARTBEAT (GREEN LED) */
+				&gpio111ol_pins		/* Use for CP HEARTBEAT (YELLOW LED)*/
+				&gpio37o_pins		/* uCP ATtiny1634 reset input */
+				&gpio38_pins		/* Used for uCP ATtiny1634 INT */
+				&gpio0ol_pins		/* UART RXA (Input) On-Moudle SPI to UART (SPI2 / CS0)*/
+				&gpio1ol_pins		/* UART TXA (Output) On-Moudle SPI to UART (SPI2 / CS0) */
+				&gpio2ol_pins		/* UART RXB (Input)  On-Moudle SPI to UART (SPI2 / CS0) */
+				&gpio3ol_pins		/* UART TXB (Output)  On-Moudle SPI to UART (SPI2 / CS0) */>;
+	};
+
+	jtag {
+		compatible = "nuvoton,npcm750-jtag";
+		enable_pspi_jtag = <1>;
+		pspi-index = <2>;
+		tck {
+			label = "tck";
+			gpios = <&gpio0 19 0>;
+			reg = <0xf0010000 0x1000>;
+			offset = <19>;
+		};
+
+		tdi {
+			label = "tdi";
+			gpios = <&gpio0 17 0>;
+			reg = <0xf0010000 0x1000>;
+			offset = <17>;
+		};
+
+		tdo {
+			label = "tdo";
+			gpios = <&gpio0 18 0>;
+			reg = <0xf0010000 0x1000>;
+			offset = <18>;
+		};
+
+		tms {
+			label = "tms";
+			gpios = <&gpio0 16 0>;
+			reg = <0xf0010000 0x1000>;
+			offset = <16>;
+		};
+/*
+		trst {
+			label = "trst";
+			gpios = <&gpio5 0 0>;
+			reg = <0xf0015000 0x1000>;
+			offset = <0>;
+		};
+*/
+	 };
+
+};
+
+&gcr {
+	serial_port_mux: mux-controller {
+	compatible = "mmio-mux";
+	#mux-control-cells = <1>;
+
+	mux-reg-masks = <0x38 0x07>;
+	idle-states = <2>; /* Serial port mode 3 (takeover) */
+	};
+};
