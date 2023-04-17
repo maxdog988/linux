@@ -4,6 +4,7 @@
 /dts-v1/;
 #include "nuvoton-npcm845.dtsi"
 #include "nuvoton-npcm845-pincfg-evb.dtsi"
+#include <dt-bindings/i2c/i2c.h>
 
 / {
 	model = "Nuvoton npcm845 Development Board (Device Tree)";
@@ -516,7 +517,11 @@
 
 &i2c0 {
 	status = "okay";
-
+	mctp-controller;
+	mctp@10 {
+		compatible = "mctp-i2c-controller";
+		reg = <(0x11 | I2C_OWN_SLAVE_ADDRESS)>;
+	};
 };
 
 &i2c1 {
@@ -553,6 +558,11 @@
 
 &i2c4 {
 	status = "okay";
+	mctp-controller;
+	mctp@40 {
+		compatible = "mctp-i2c-controller";
+		reg = <(0x12 | I2C_OWN_SLAVE_ADDRESS)>;
+	};
 };
 
 &i2c5 {
