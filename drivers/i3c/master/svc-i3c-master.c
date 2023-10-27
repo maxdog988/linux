@@ -282,7 +282,7 @@ struct svc_i3c_master {
 		struct list_head list;
 		struct svc_i3c_xfer *cur;
 		/* Prevent races between transfers */
-		struct mutex lock;
+		spinlock_t lock;
 	} xferqueue;
 	struct {
 		unsigned int num_slots;
@@ -1092,6 +1092,7 @@ static int svc_i3c_master_do_daa(struct i3c_master_controller *m)
 {
 	struct svc_i3c_master *master = to_svc_i3c_master(m);
 	u8 addrs[SVC_I3C_MAX_DEVS];
+	unsigned long flags;
 	unsigned int dev_nb;
 	int ret, i;
 
@@ -1101,7 +1102,7 @@ static int svc_i3c_master_do_daa(struct i3c_master_controller *m)
 		return ret;
 	}
 
-	mutex_lock(&master->xferqueue.lock);
+	spin_lock_irqsave(&master->xferqueue.lock, flags);
 	local_irq_disable();
 	/*
 	 * Fix SCL/SDA timing issue during DAA.
@@ -1112,7 +1113,7 @@ static int svc_i3c_master_do_daa(struct i3c_master_controller *m)
 	ret = svc_i3c_master_do_daa_locked(master, addrs, &dev_nb);
 	svc_i3c_master_set_sda_skew(master, 0);
 	local_irq_enable();
-	mutex_unlock(&master->xferqueue.lock);
+	spin_unlock_irqrestore(&master->xferqueue.lock, flags);
 	if (ret) {
 		svc_i3c_master_emit_stop(master);
 		svc_i3c_master_clear_merrwarn(master);
@@ -1485,9 +1486,11 @@ static void svc_i3c_master_dequeue_xfer_locked(struct svc_i3c_master *master,
 static void svc_i3c_master_dequeue_xfer(struct svc_i3c_master *master,
 					struct svc_i3c_xfer *xfer)
 {
-	mutex_lock(&master->xferqueue.lock);
+	unsigned long flags;
+
+	spin_lock_irqsave(&master->xferqueue.lock, flags);
 	svc_i3c_master_dequeue_xfer_locked(master, xfer);
-	mutex_unlock(&master->xferqueue.lock);
+	spin_unlock_irqrestore(&master->xferqueue.lock, flags);
 }
 
 static void svc_i3c_master_start_xfer_locked(struct svc_i3c_master *master)
@@ -1497,12 +1500,6 @@ static void svc_i3c_master_start_xfer_locked(struct svc_i3c_master *master)
 
 	if (!xfer)
 		return;
-
-	ret = pm_runtime_resume_and_get(master->dev);
-	if (ret < 0) {
-		dev_err(master->dev, "<%s> Cannot get runtime PM.\n", __func__);
-		return;
-	}
 
 	svc_i3c_master_clear_merrwarn(master);
 	svc_i3c_master_flush_fifo(master);
@@ -1517,9 +1514,6 @@ static void svc_i3c_master_start_xfer_locked(struct svc_i3c_master *master)
 		if (ret)
 			break;
 	}
-
-	pm_runtime_mark_last_busy(master->dev);
-	pm_runtime_put_autosuspend(master->dev);
 
 	xfer->ret = ret;
 	complete(&xfer->comp);
@@ -1540,16 +1534,29 @@ static void svc_i3c_master_start_xfer_locked(struct svc_i3c_master *master)
 static void svc_i3c_master_enqueue_xfer(struct svc_i3c_master *master,
 					struct svc_i3c_xfer *xfer)
 {
+	unsigned long flags;
+	int ret;
+
+	ret = pm_runtime_resume_and_get(master->dev);
+	if (ret < 0) {
+		dev_err(master->dev, "<%s> Cannot get runtime PM.\n", __func__);
+		return;
+	}
+
 	init_completion(&xfer->comp);
-	mutex_lock(&master->xferqueue.lock);
+	spin_lock_irqsave(&master->xferqueue.lock, flags);
 	if (master->xferqueue.cur) {
 		list_add_tail(&xfer->node, &master->xferqueue.list);
 	} else {
 		master->xferqueue.cur = xfer;
 		svc_i3c_master_start_xfer_locked(master);
 	}
-	mutex_unlock(&master->xferqueue.lock);
+	spin_unlock_irqrestore(&master->xferqueue.lock, flags);
+
+	pm_runtime_mark_last_busy(master->dev);
+	pm_runtime_put_autosuspend(master->dev);
 }
+
 
 static bool
 svc_i3c_master_supports_ccc_cmd(struct i3c_master_controller *master,
@@ -2352,7 +2359,7 @@ static int svc_i3c_master_probe(struct platform_device *pdev)
 
 	master->free_slots = GENMASK(SVC_I3C_MAX_DEVS - 1, 0);
 
-	mutex_init(&master->xferqueue.lock);
+	spin_lock_init(&master->xferqueue.lock);
 	INIT_LIST_HEAD(&master->xferqueue.list);
 
 	spin_lock_init(&master->ibi.lock);
