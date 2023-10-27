@@ -560,6 +560,11 @@ static void mctp_sk_destruct(struct sock *sk)
 	skb_queue_purge(&sk->sk_receive_queue);
 }
 
+static void mctp_sk_destruct(struct sock *sk)
+{
+	skb_queue_purge(&sk->sk_receive_queue);
+}
+
 static struct proto mctp_proto = {
 	.name		= "MCTP",
 	.owner		= THIS_MODULE,
