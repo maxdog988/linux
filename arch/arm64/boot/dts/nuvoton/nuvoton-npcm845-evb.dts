@@ -584,6 +584,12 @@
 
 &i2c11 {
 	status = "okay";
+	slave_eeprom:slave_eeprom@40000050 {
+		compatible = "slave-24c02";
+		reg = <0x40000050>;
+		status = "okay";
+	};
+	
 };
 
 &i2c12 {
