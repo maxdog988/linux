@@ -678,6 +678,7 @@
 	i2c-scl-hz = <400000>;
 	dmas = <&gdma0 0>, <&gdma0 1>;
 	dma-names = "tx", "rx";
+	mctp-controller;
 };
 
 &mc {
