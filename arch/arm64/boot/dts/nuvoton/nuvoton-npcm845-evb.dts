@@ -12,6 +12,11 @@
 
 	aliases {
 		serial0 = &serial0;
+		serial1 = &serial1;
+		serial2 = &serial2;
+		serial3 = &serial3;
+		serial4 = &serial4;
+		serial5 = &serial5;
 		ethernet0 = &gmac0;
 		ethernet1 = &gmac1;
 		ethernet2 = &gmac2;
@@ -234,6 +239,27 @@
 &serial0 {
 	status = "okay";
 };
+
+&serial1 {
+	status = "okay";
+};
+
+&serial2 {
+	status = "okay";
+};
+
+&serial3 {
+	status = "okay";
+};
+
+&serial4 {
+	status = "okay";
+};
+
+&serial5 {
+	status = "okay";
+};
+
 
 &fiu0 {
 	status = "okay";
