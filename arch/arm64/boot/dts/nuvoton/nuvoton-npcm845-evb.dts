@@ -726,7 +726,24 @@
 			&pin6_slew
 			&pin7_slew
 			&pin108_slew
-			&pin109_slew>;
+			&pin109_slew
+			&pin96_oh>;
+
+		pin96_oh: pin96_oh {
+			pins = "GPIO96/CP1_GPIO7/TP_GPIO7";
+			bias-disable;
+			output-high;
+		};
+
+		gpio3: gpio@f0013000 {
+			/* SMC_FORCE_DL=gpio96 */
+			gpio-line-names =
+			/*96-127*/
+			"SMC_FORCE_DL","","","","","","","",
+			"","","","","","","","",
+			"","","","","","","","",
+			"","","","","","","","";
+		};
 };
 
 &vcd {
