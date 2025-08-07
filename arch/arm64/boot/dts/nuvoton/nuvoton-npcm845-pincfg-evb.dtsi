@@ -35,6 +35,18 @@
 			pins = "GPIO07/IOX2_DO/SMB2D_SCL";
 			slew-rate = <1>;
 		};
+		pin17_slew: pin17_slew {
+			pins = "GPIO17/PSPI_DI/CP1_GPIO5";
+			slew-rate = <1>;
+		};
+		pin18_slew: pin18_slew {
+			pins = "GPIO18/PSPI_DO/SMB4B_SDA";
+			slew-rate = <1>;
+		};
+		pin19_slew: pin19_slew {
+			pins = "GPIO19/PSPI_CK/SMB4B_SCL";
+			slew-rate = <1>;
+		};
 		pin108_slew: pin108-slew {
 			pins = "GPIO108/SG1_MDC";
 			slew-rate = <1>;

@@ -725,6 +725,9 @@
 			&pin5_slew
 			&pin6_slew
 			&pin7_slew
+			&pin17_slew
+			&pin18_slew
+			&pin19_slew
 			&pin108_slew
 			&pin109_slew
 			&pin96_oh>;
