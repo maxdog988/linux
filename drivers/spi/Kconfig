@@ -752,6 +752,13 @@ config SPI_NPCM_FLASH
 	help
 	  Enable Nuvoton ESPI Flash
 
+config SPI_NPCM_JTM
+	tristate "Nuvoton NPCM JTM SPI Controller"
+	depends on ARCH_NPCM || COMPILE_TEST
+	help
+	  This driver provides support for Nuvoton NPCM BMC
+	  JTM SPI controller in master mode.
+
 config SPI_LANTIQ_SSC
 	tristate "Lantiq SSC SPI controller"
 	depends on LANTIQ || X86 || COMPILE_TEST
