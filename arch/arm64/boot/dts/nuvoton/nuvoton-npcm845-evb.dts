@@ -74,10 +74,94 @@
 		reg = <0x0 0x0 0x0 0x40000000>;
 	};
 
+	/*
+	 * Voltage dividers for ADC channels.
+	 * Adjust output-ohms and full-ohms according to your schematic.
+	 * Formula: Vin = Vout × (full-ohms / output-ohms)
+	 *
+	 * Example: If R1 = 100K, R2 = 10K (10:1 divider)
+	 *   output-ohms = 10000  (R2, resistor to GND)
+	 *   full-ohms = 110000   (R1 + R2)
+	 */
+	adc0_div: adc0-voltage-divider {
+		compatible = "voltage-divider";
+		io-channels = <&adc 0>;
+		io-channel-names = "parent";
+		#io-channel-cells = <0>;
+		output-ohms = <4700>;
+		full-ohms = <104700>;
+	};
+
+	adc1_div: adc1-voltage-divider {
+		compatible = "voltage-divider";
+		io-channels = <&adc 1>;
+		io-channel-names = "parent";
+		#io-channel-cells = <0>;
+		output-ohms = <10000>;
+		full-ohms = <110000>;
+	};
+
+	adc2_div: adc2-voltage-divider {
+		compatible = "voltage-divider";
+		io-channels = <&adc 2>;
+		io-channel-names = "parent";
+		#io-channel-cells = <0>;
+		output-ohms = <2000>;
+		full-ohms = <12000>;
+	};
+
+	adc3_div: adc3-voltage-divider {
+		compatible = "voltage-divider";
+		io-channels = <&adc 3>;
+		io-channel-names = "parent";
+		#io-channel-cells = <0>;
+		output-ohms = <4700>;
+		full-ohms = <14700>;
+	};
+
+	adc4_div: adc4-voltage-divider {
+		compatible = "voltage-divider";
+		io-channels = <&adc 4>;
+		io-channel-names = "parent";
+		#io-channel-cells = <0>;
+		output-ohms = <10000>;
+		full-ohms = <14700>;
+	};
+
+	adc5_div: adc5-voltage-divider {
+		compatible = "voltage-divider";
+		io-channels = <&adc 5>;
+		io-channel-names = "parent";
+		#io-channel-cells = <0>;
+		output-ohms = <10000>;
+		full-ohms = <12000>;
+	};
+
+	adc6_div: adc6-voltage-divider {
+		compatible = "voltage-divider";
+		io-channels = <&adc 6>;
+		io-channel-names = "parent";
+		#io-channel-cells = <0>;
+		output-ohms = <100000>;
+		full-ohms = <110000>;
+	};
+
+	adc7_div: adc7-voltage-divider {
+		compatible = "voltage-divider";
+		io-channels = <&adc 7>;
+		io-channel-names = "parent";
+		#io-channel-cells = <0>;
+		output-ohms = <100000>;
+		full-ohms = <104700>;
+	};
+
 	iio-hwmon {
 		compatible = "iio-hwmon";
+		/* Use voltage-dividers to get real voltage values */
 		io-channels = <&adc 0>, <&adc 1>, <&adc 2>, <&adc 3>,
-			<&adc 4>, <&adc 5>, <&adc 6>, <&adc 7>;
+			<&adc 4>, <&adc 5>, <&adc 6>, <&adc 7>,
+			<&adc0_div>, <&adc1_div>, <&adc2_div>, <&adc3_div>,
+			<&adc4_div>, <&adc5_div>, <&adc6_div>, <&adc7_div>;
 	};
 
 	spi_gpio: spi-gpio {
