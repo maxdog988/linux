@@ -74,6 +74,9 @@
 #define NPCM_RC_RESETS_PER_REG	32
 #define NPCM_MASK_RESETS	GENMASK(4, 0)
 
+#define NPCM_INTCR3		0x9c
+#define NPCM_INTCR3_UHUB_RWUD	BIT(5)
+
 enum {
 	BMC_NPCM7XX = 0,
 	BMC_NPCM8XX,
@@ -328,6 +331,10 @@ static void npcm_usb_reset_npcm8xx(struct npcm_rc_data *rc)
 	u32 ipsrst3_bits = 0;
 	u32 ipsrst4_bits = NPCM_IPSRST4_USB_HOST2 | NPCM_IPSRST4_USBPHY3;
 
+	/* Disable hub remote wakeup */
+	regmap_update_bits(rc->gcr_regmap, NPCM_INTCR3,
+			   NPCM_INTCR3_UHUB_RWUD, NPCM_INTCR3_UHUB_RWUD);
+
 	/* checking which USB device is enabled */
 	regmap_read(rc->gcr_regmap, NPCM_MDLR_OFFSET, &mdlr);
 	if (!(mdlr & NPCM8XX_MDLR_USBD0_3)) {
@@ -375,6 +382,8 @@ static void npcm_usb_reset_npcm8xx(struct npcm_rc_data *rc)
 	regmap_update_bits(rc->gcr_regmap, NPCM_USB3PHYCTL_OFFSET,
 			   NPCM_USBXPHYCTL_RS, 0);
 
+	mdelay(10);
+
 	/* deassert reset USB PHY */
 	iprst3 &= ~(NPCM_IPSRST3_USBPHY1 | NPCM_IPSRST3_USBPHY2);
 	writel(iprst3, rc->base + NPCM_IPSRST3);
@@ -390,6 +399,10 @@ static void npcm_usb_reset_npcm8xx(struct npcm_rc_data *rc)
 			   NPCM_USBXPHYCTL_RS, NPCM_USBXPHYCTL_RS);
 	regmap_update_bits(rc->gcr_regmap, NPCM_USB3PHYCTL_OFFSET,
 			   NPCM_USBXPHYCTL_RS, NPCM_USBXPHYCTL_RS);
+
+	/* deassert reset USB HUB */
+	iprst3 &= ~NPCM_IPSRST3_USBHUB;
+	writel(iprst3, rc->base + NPCM_IPSRST3);
 
 	/* deassert reset USB devices*/
 	iprst1 &= ~ipsrst1_bits;
