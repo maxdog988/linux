@@ -179,6 +179,7 @@ obj-$(CONFIG_SENSORS_S3C)	+= s3c-hwmon.o
 obj-$(CONFIG_SENSORS_APML_COMMON)	+= apml_common.o
 obj-$(CONFIG_SENSORS_SBTSI)	+= apml_sbtsi.o
 obj-$(CONFIG_SENSORS_SBRMI)	+= sbrmi.o sbrmi-common.o
+obj-$(CONFIG_SENSORS_APML_ALERTL)	+= apml_alertl.o
 obj-$(CONFIG_SENSORS_SCH56XX_COMMON)+= sch56xx-common.o
 obj-$(CONFIG_SENSORS_SCH5627)	+= sch5627.o
 obj-$(CONFIG_SENSORS_SCH5636)	+= sch5636.o

@@ -1722,6 +1722,18 @@ config SENSORS_SBRMI
 	  This driver can also be built as a module. If so, the module will
 	  be called sbrmi.
 
+config SENSORS_APML_ALERTL
+	tristate "AMD APML Alert_L driver"
+	depends on SENSORS_APML_COMMON && GPIOLIB && OF
+	help
+	  If you say yes here you get support for the AMD APML Alert_L
+	  interrupt. On Alert_L assertion, the driver reads the RAS/thermal
+	  status of registered SB-RMI and SB-TSI devices and reports the
+	  alerts to userspace via uevents.
+
+	  This driver can also be built as a module. If so, the module will
+	  be called apml_alertl.
+
 config SENSORS_SHT15
 	tristate "Sensiron humidity and temperature sensors. SHT15 and compat."
 	depends on GPIOLIB || COMPILE_TEST
