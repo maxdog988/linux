@@ -632,7 +632,7 @@ no_ibi_pool:
 	return -ENOSPC;
 }
 
-static int svc_i3c_master_handle_ibiwon(struct svc_i3c_master *master, bool autoibi)
+static int svc_i3c_master_handle_ibiwon(struct svc_i3c_master *master)
 {
 	struct svc_i3c_i2c_dev_data *data;
 	unsigned int ibitype, ibiaddr;
@@ -653,28 +653,13 @@ static int svc_i3c_master_handle_ibiwon(struct svc_i3c_master *master, bool auto
 		dev = svc_i3c_master_dev_from_addr(master, ibiaddr);
 		/* Bypass the invalid ibi with address 0 */
 		if (!dev || ibiaddr == 0) {
-			if (!autoibi) {
-				svc_i3c_master_nack_ibi(master);
-				break;
-			}
-			/*
-			 * Wait for complete to make sure the subsequent emitSTOP
-			 * request will be performed in the correct state(NORMACT).
-			 */
-			readl_relaxed_poll_timeout(master->regs + SVC_I3C_MSTATUS, status,
-						   SVC_I3C_MSTATUS_COMPLETE(status),
-						   0, 1000);
-			/* Flush the garbage data */
-			if (SVC_I3C_MSTATUS_RXPEND(status))
-				svc_i3c_master_flush_rx_fifo(master);
+			svc_i3c_master_nack_ibi(master);
 			break;
 		}
-		if (!autoibi) {
-			if (dev->info.bcr & I3C_BCR_IBI_PAYLOAD)
-				svc_i3c_master_ack_ibi(master, true);
-			else
-				svc_i3c_master_ack_ibi(master, false);
-		}
+		if (dev->info.bcr & I3C_BCR_IBI_PAYLOAD)
+			svc_i3c_master_ack_ibi(master, true);
+		else
+			svc_i3c_master_ack_ibi(master, false);
 		svc_i3c_master_handle_ibi(master, dev);
 		break;
 	case SVC_I3C_MSTATUS_IBITYPE_HOT_JOIN:
@@ -764,7 +749,7 @@ static void svc_i3c_master_ibi_isr(struct svc_i3c_master *master)
 		goto ibi_out;
 
 	/*
-	 * IBIWON may be set before SVC_I3C_MCTRL_REQUEST_AUTO_IBI, causing
+	 * IBIWON may be set before the START request, causing
 	 * readl_relaxed_poll_timeout() to return immediately. Consequently,
 	 * ibitype will be 0 since it was last updated only after the 8th SCL
 	 * cycle, leading to missed client IBI handlers.
@@ -772,25 +757,34 @@ static void svc_i3c_master_ibi_isr(struct svc_i3c_master *master)
 	 * A typical scenario is when IBIWON occurs and bus arbitration is lost
 	 * at svc_i3c_master_priv_xfers().
 	 *
-	 * Clear SVC_I3C_MINT_IBIWON before sending SVC_I3C_MCTRL_REQUEST_AUTO_IBI.
+	 * Clear SVC_I3C_MINT_IBIWON before sending the START request.
 	 */
 	writel(SVC_I3C_MINT_IBIWON, master->regs + SVC_I3C_MSTATUS);
 
-	/* Acknowledge the incoming interrupt with the AUTOIBI mechanism */
-	writel(SVC_I3C_MCTRL_REQUEST_AUTO_IBI |
-	       SVC_I3C_MCTRL_IBIRESP_AUTO |
-	       SVC_I3C_MCTRL_RDTERM(SVC_I3C_MAX_IBI_PAYLOAD_SIZE),
+	/*
+	 * Write REQUEST_START_ADDR request to emit broadcast address for arbitration,
+	 * instead of using AUTO_IBI.
+	 *
+	 * Using AutoIBI request may cause controller to remain in AutoIBI state when
+	 * there is a glitch on SDA line (high->low->high).
+	 * 1. SDA high->low, raising an interrupt to execute IBI isr.
+	 * 2. SDA low->high.
+	 * 3. IBI isr writes an AutoIBI request.
+	 * 4. The controller will not start AutoIBI process because SDA is not low.
+	 * 5. IBIWON polling times out.
+	 * 6. Controller remains in AutoIBI state and doesn't accept EmitStop request.
+	 */
+	writel(SVC_I3C_MCTRL_REQUEST_START_ADDR |
+	       SVC_I3C_MCTRL_TYPE_I3C |
+	       SVC_I3C_MCTRL_IBIRESP_MANUAL |
+	       SVC_I3C_MCTRL_DIR(SVC_I3C_MCTRL_DIR_WRITE) |
+	       SVC_I3C_MCTRL_ADDR(I3C_BROADCAST_ADDR),
 	       master->regs + SVC_I3C_MCTRL);
 
 	/* Wait for IBIWON, should take approximately 100us */
 	ret = readl_relaxed_poll_timeout_atomic(master->regs + SVC_I3C_MSTATUS, val,
 					 SVC_I3C_MSTATUS_IBIWON(val), 0, 1000);
 	if (ret) {
-		/* Cancle AUTOIBI if not started */
-		val = readl(master->regs + SVC_I3C_MCTRL);
-		if (SVC_I3C_MCTRL_REQUEST(val) == SVC_I3C_MCTRL_REQUEST_AUTO_IBI)
-			writel(0, master->regs + SVC_I3C_MCTRL);
-
 		dev_err(master->dev, "Timeout when polling for IBIWON\n");
 		svc_i3c_master_clear_merrwarn(master);
 		svc_i3c_master_emit_stop(master);
@@ -798,7 +792,7 @@ static void svc_i3c_master_ibi_isr(struct svc_i3c_master *master)
 		goto ibi_out;
 	}
 
-	ret = svc_i3c_master_handle_ibiwon(master, true);
+	ret = svc_i3c_master_handle_ibiwon(master);
 	if (ret) {
 		/*
 		 * The target can raise an event when bus is available(free at least 1us).
@@ -1218,7 +1212,7 @@ static int svc_i3c_master_do_daa_locked(struct svc_i3c_master *master,
 		}
 		/* runtime do_daa may ibiwon by others slave devices */
 		if (SVC_I3C_MSTATUS_IBIWON(reg)) {
-			ret = svc_i3c_master_handle_ibiwon(master, false);
+			ret = svc_i3c_master_handle_ibiwon(master);
 			if (ret) {
 				dev_err(master->dev, "daa: handle ibi event fail, ret=%d\n", ret);
 				return ret;
