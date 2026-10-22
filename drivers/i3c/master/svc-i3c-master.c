@@ -1616,6 +1616,9 @@ static int svc_i3c_master_xfer(struct svc_i3c_master *master,
 	 */
 	spin_lock_irqsave(&master->req_lock, flags);
 
+	/* clean SVC_I3C_MINT_IBIWON w1c bits */
+	writel(SVC_I3C_MINT_IBIWON, master->regs + SVC_I3C_MSTATUS);
+
 	if (rnw && max_rd_turn)
 		timeout = ktime_add_us(ktime_get(), max_rd_turn);
 
