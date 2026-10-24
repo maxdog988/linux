@@ -202,6 +202,81 @@ out:
 /* pointer and payload_len refer to the data AFTER the Common Header.  */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Map a response Status (spec §5.2) to an errno.  0x00-0x3F are the generic
+ * codes of Table 4; 0x40-0x7F are defined per channel type, so the same
+ * value means different things on different channels.  Errnos follow the
+ * conventions of the subsystem each channel is exposed through (e.g.
+ * Documentation/i2c/fault-codes.rst for I2C).
+ */
+static int obmf_status_to_errno(u8 channel_type, u8 status)
+{
+	switch (status) {
+	case OBMF_STATUS_INVALID_CMD:		return -EOPNOTSUPP;
+	case OBMF_STATUS_TIMEOUT:		return -ETIMEDOUT;
+	case OBMF_STATUS_NOT_READY:		return -EAGAIN;
+	case OBMF_STATUS_PERMANENT_ERROR:	return -EIO;
+	case OBMF_STATUS_UNKNOWN_CHANNEL:	return -ENXIO;
+	case OBMF_STATUS_SIZE_NOT_SUPPORTED:	return -EMSGSIZE;
+	}
+
+	switch (channel_type) {
+	case OBMF_TYPE_CONFIG:
+	case OBMF_TYPE_MMIO:
+	case OBMF_TYPE_IO:
+		/* Tables 7 and 54 */
+		switch (status) {
+		case OBMF_MMIO_STATUS_ADDR_OUT_OF_RANGE: return -EFAULT;
+		case OBMF_MMIO_STATUS_ACCESS_DENIED:	 return -EACCES;
+		}
+		break;
+	case OBMF_TYPE_GPIO:
+		/* Table 17 */
+		switch (status) {
+		case OBMF_GPIO_STATUS_INDEX_NOT_SUPPORTED: return -EINVAL;
+		case OBMF_GPIO_STATUS_INT_NOT_SUPPORTED:   return -EOPNOTSUPP;
+		case OBMF_GPIO_STATUS_INVALID_OPERATION:   return -EPERM;
+		}
+		break;
+	case OBMF_TYPE_SERIAL:
+		/* Table 21 */
+		if (status == OBMF_SERIAL_STATUS_LINE_TIMEOUT)
+			return -ETIMEDOUT;
+		break;
+	case OBMF_TYPE_I2C:
+		/* Table 25 */
+		switch (status) {
+		case OBMF_I2C_STATUS_TIMEOUT:	return -ETIMEDOUT;
+		case OBMF_I2C_STATUS_ARB_LOST:	return -EAGAIN;
+		case OBMF_I2C_STATUS_BUS_BUSY:	return -EBUSY;
+		case OBMF_I2C_STATUS_NACK:	return -ENXIO;
+		}
+		break;
+	case OBMF_TYPE_I3C:
+		/* Table 34 */
+		switch (status) {
+		case OBMF_I3C_STATUS_BUS_TIMEOUT: return -ETIMEDOUT;
+		case OBMF_I3C_STATUS_ARB_LOST:	  return -EAGAIN;
+		case OBMF_I3C_STATUS_BUS_BUSY:	  return -EBUSY;
+		case OBMF_I3C_STATUS_NACK:	  return -ENXIO;
+		case OBMF_I3C_STATUS_ILLEGAL_CCC: return -EPROTO;
+		}
+		break;
+	case OBMF_TYPE_MEM_DEV:
+		/* Table 60 */
+		switch (status) {
+		case OBMF_MEM_DEV_STATUS_ACCESS_DENIED:	    return -EACCES;
+		case OBMF_MEM_DEV_STATUS_UNSUPPORTED_SIZE:  return -EMSGSIZE;
+		case OBMF_MEM_DEV_STATUS_ERASE_NOT_ALIGNED: return -EINVAL;
+		case OBMF_MEM_DEV_STATUS_WRITE_PROTECTED:   return -EROFS;
+		}
+		break;
+	}
+
+	/* Bus/framing/parity faults, I2C Target errors, reserved codes */
+	return -EIO;
+}
+
 static void obmf_dispatch_message(struct obmf_device *odev,
 				  struct obmf_common_hdr *hdr,
 				  const u8 *payload, int payload_len)
@@ -227,35 +302,8 @@ static void obmf_dispatch_message(struct obmf_device *odev,
 			dev_dbg(&odev->intf->dev,
 				"ch%u: response status 0x%02x\n",
 				channel_id, hdr_status);
-			switch (hdr_status) {
-			case OBMF_STATUS_INVALID_CMD:
-				ch->status = -EOPNOTSUPP;
-				break;
-			case OBMF_STATUS_TIMEOUT:
-				ch->status = -ETIMEDOUT;
-				break;
-			case OBMF_STATUS_NOT_READY:
-				ch->status = -EAGAIN;
-				break;
-			case OBMF_STATUS_PERMANENT_ERROR:
-				ch->status = -EIO;
-				break;
-			case OBMF_STATUS_UNKNOWN_CHANNEL:
-				ch->status = -ENXIO;
-				break;
-			case OBMF_STATUS_SIZE_NOT_SUPPORTED:
-				ch->status = -EMSGSIZE;
-				break;
-			case OBMF_MMIO_STATUS_ADDR_OUT_OF_RANGE:
-				ch->status = -EFAULT;
-				break;
-			case OBMF_MMIO_STATUS_ACCESS_DENIED:
-				ch->status = -EACCES;
-				break;
-			default:
-				ch->status = -EIO;
-				break;
-			}
+			ch->status = obmf_status_to_errno(ch->channel_type,
+							  hdr_status);
 			complete(&ch->done);
 			return;
 		}
