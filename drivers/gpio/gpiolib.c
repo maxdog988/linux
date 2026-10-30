@@ -5,6 +5,7 @@
 #include <linux/module.h>
 #include <linux/interrupt.h>
 #include <linux/irq.h>
+#include <linux/irqdesc.h>
 #include <linux/spinlock.h>
 #include <linux/list.h>
 #include <linux/device.h>
@@ -491,6 +492,48 @@ bool gpiochip_line_is_valid(const struct gpio_chip *gc,
 }
 EXPORT_SYMBOL_GPL(gpiochip_line_is_valid);
 
+static void gpiod_free_irqs(struct gpio_desc *desc)
+{
+	int irq = gpiod_to_irq(desc);
+	struct irq_desc *irqd;
+	void *cookie;
+
+	if (irq <= 0)
+		return;
+	irqd = irq_to_desc(irq);
+	if (!irqd)
+		return;
+
+	for (;;) {
+		mutex_lock(&irqd->request_mutex);
+		if (!irq_desc_has_action(irqd)) {
+			mutex_unlock(&irqd->request_mutex);
+			return;
+		}
+		cookie = irqd->action->dev_id;
+		mutex_unlock(&irqd->request_mutex);
+
+		free_irq(irq, cookie);
+	}
+}
+
+/*
+ * The chip is going away but consumers may still hold interrupts on its
+ * lines and cannot be notified; free them here or the irq procfs entries
+ * and descriptors leak.
+ */
+static void gpiochip_free_remaining_irqs(struct gpio_chip *gc)
+{
+	struct gpio_desc *desc;
+	unsigned int i;
+
+	for (i = 0; i < gc->ngpio; i++) {
+		desc = gpiochip_get_desc(gc, i);
+		if (!IS_ERR(desc) && test_bit(FLAG_USED_AS_IRQ, &desc->flags))
+			gpiod_free_irqs(desc);
+	}
+}
+
 static void gpiodevice_release(struct device *dev)
 {
 	struct gpio_device *gdev = container_of(dev, struct gpio_device, dev);
@@ -882,6 +925,8 @@ void gpiochip_remove(struct gpio_chip *gc)
 	/* FIXME: should the legacy sysfs handling be moved to gpio_device? */
 	gpiochip_sysfs_unregister(gdev);
 	gpiochip_free_hogs(gc);
+	gpiochip_free_remaining_irqs(gc);
+
 	/*
 	 * Drop the device from the global list now: its chip is about to be
 	 * NULLed and name lookups must no longer walk it while consumers
