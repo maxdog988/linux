@@ -497,7 +497,8 @@ static void gpiodevice_release(struct device *dev)
 	unsigned long flags;
 
 	spin_lock_irqsave(&gpio_lock, flags);
-	list_del(&gdev->list);
+	if (!list_empty(&gdev->list))
+		list_del(&gdev->list);
 	spin_unlock_irqrestore(&gpio_lock, flags);
 
 	ida_free(&gpio_ida, gdev->id);
@@ -881,6 +882,15 @@ void gpiochip_remove(struct gpio_chip *gc)
 	/* FIXME: should the legacy sysfs handling be moved to gpio_device? */
 	gpiochip_sysfs_unregister(gdev);
 	gpiochip_free_hogs(gc);
+	/*
+	 * Drop the device from the global list now: its chip is about to be
+	 * NULLed and name lookups must no longer walk it while consumers
+	 * keep the device alive.
+	 */
+	spin_lock_irqsave(&gpio_lock, flags);
+	list_del_init(&gdev->list);
+	spin_unlock_irqrestore(&gpio_lock, flags);
+
 	/* Numb the device, cancelling all outstanding operations */
 	gdev->chip = NULL;
 	gpiochip_irqchip_remove(gc);
